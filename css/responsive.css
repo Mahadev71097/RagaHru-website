@@ -70,6 +70,11 @@
 
   .collection__head { gap: 14px; }
   .collection__count { display: none; }
+
+  /* The heading cannot wrap, so on a narrow screen it has to be sized to
+     fit. Left as it was, "CHRISTIAN WEDDINGS" ran past the gutter and was
+     clipped by the edge of the screen. */
+  .collection__title { font-size: clamp(1.12rem, 3.6vw, 1.6rem); letter-spacing: 0.12em; }
 }
 
 @media (max-width: 768px) {
@@ -82,12 +87,20 @@
 
   .grid { gap: 46px 18px; }
 
+  /* signature, heading and rule still read as one line - the heading is just
+     given only as much room as the screen actually has */
+  .collection__head { gap: 12px; }
+  .collection__head .signature { width: clamp(26px, 9vw, 44px); }
+  .collection__title { font-size: clamp(1rem, 4.5vw, 1.3rem); letter-spacing: 0.1em; }
+
   /* the header is fixed, so the masthead must always clear it */
   /* the hero stops short of a full screen, so the collections below are
      visibly there rather than hidden past the fold */
   .hero {
+    /* A shorter horizon on a short screen. padding-bottom follows it, so the
+       phones keep standing clear of the paper instead of dissolving into it. */
+    --horizon-h: 96px;
     padding-top: calc(var(--header-h) + 26px);
-    padding-bottom: 54px;
   }
   .hero__sub { margin-top: 16px; }
   .hero__note { margin-top: 14px; }
@@ -98,7 +111,6 @@
   .card__desc { font-size: 12px; max-width: 26ch; }
   .features { margin-top: 13px; }
   .features__item { font-size: 9px; letter-spacing: 0.13em; }
-  .features__item .ico { font-size: 10px; }
   .features__item + .features__item { margin-left: 9px; }
   .features__item + .features__item::before { margin-right: 9px; }
   .price { margin-top: 15px; gap: 9px; }
@@ -169,12 +181,14 @@
 @media (max-width: 340px) {
   :root { --phone-h: 296px; }
 
-  :root { --header-h: 96px; }
-  .site-header__inner {
-    flex-direction: column;
-    gap: 8px;
-    padding-block: 12px;
-  }
+  /* The bar used to stack the wordmark over the navigation here, which cost
+     120px of a 720px screen once both had a proper touch target. Measured at
+     320px the two sit side by side with room to spare, so the row stays and
+     the header stays shallow. */
+  .brand { font-size: 14px; }
+  .site-nav__list { gap: 11px; }
+  .site-nav__link { font-size: 8.5px; letter-spacing: 0.14em; }
+
   .hero__title { font-size: 2.05rem; }
 }
 

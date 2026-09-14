@@ -161,6 +161,10 @@ var HeroStage = (function () {
       stage.appendChild(warmer);
     }
 
+    /* Nothing to warm if the engine has already found this file missing -
+       otherwise every turn of the rotation asks for it again. */
+    if (Preview.isDead && Preview.isDead(entry.previewPath)) { return; }
+
     if (entry.previewPath && warmer.getAttribute('src') !== entry.previewPath) {
       warmer.setAttribute('src', entry.previewPath);
       try { warmer.load(); } catch (err) { /* nothing to do */ }

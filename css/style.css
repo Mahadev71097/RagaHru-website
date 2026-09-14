@@ -107,6 +107,14 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+/* iOS and Android paint a translucent box over anything tappable. On a page
+   built out of dark glass and paper that flash is the one thing on it that
+   does not belong. */
+a, button, [role="button"], summary, label,
+.card, .phone, .modal__close {
+  -webkit-tap-highlight-color: transparent;
+}
+
 h1, h2, h3, p, ul, figure { margin: 0; padding: 0; }
 [hidden] { display: none !important; }
 ul { list-style: none; }
@@ -114,11 +122,16 @@ img, video { display: block; max-width: 100%; }
 a { color: inherit; text-decoration: none; }
 button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
 
+/* The page is drawn edge to edge (viewport-fit=cover), so in landscape the
+   notch and the home indicator sit over it. max() keeps the normal gutter
+   everywhere it is already big enough - which is every portrait phone - and
+   only grows on the side an inset actually exists. */
 .wrap {
   width: 100%;
   max-width: var(--wrap);
   margin-inline: auto;
-  padding-inline: var(--gutter);
+  padding-left: max(var(--gutter), env(safe-area-inset-left, 0px));
+  padding-right: max(var(--gutter), env(safe-area-inset-right, 0px));
 }
 
 /* the faintest paper grain — it should read as warmth, not as texture */
@@ -131,6 +144,16 @@ body::after {
   opacity: 0.4;
   mix-blend-mode: multiply;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
+}
+
+/* Safari only learned `overflow: clip` in 16. Where it is missing the rule
+   above does nothing and the hero's glows - deliberately wider than their
+   boxes - would push the page sideways. Clipping on the root rather than the
+   body keeps the document the scroll container, so smooth scrolling and
+   scroll-padding-top carry on working. */
+@supports not (overflow: clip) {
+  html { overflow-x: hidden; }
+  body { overflow-x: hidden; }
 }
 
 /* =========================================================================
@@ -286,6 +309,38 @@ html.is-ready .boot {
   transition: background 0.5s var(--ease);
 }
 
+/* Over the masthead the bar is transparent, which is right at rest but lets
+   the headline scroll straight through the wordmark and the navigation. This
+   scrim rides under the bar and fades out below it, so copy passing beneath
+   is pushed back into the dark and the nav stays legible. It is held back
+   until the page has actually moved: at rest the masthead is still pristine,
+   with no band across the top of it. */
+.site-header::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  /* taller than the bar, so it lands as light rather than as an edge */
+  height: calc(100% + 42px);
+  z-index: -1;
+  opacity: 0;
+  pointer-events: none;
+  /* Nearly solid for the height of the bar itself, then a long tail that
+     lands on nothing. The stop at 63% is where the bar's own bottom edge
+     falls, so the fade begins below the rule rather than across it. */
+  background: linear-gradient(180deg,
+    rgba(20, 17, 14, 0.985) 0%,
+    rgba(20, 17, 14, 0.965) 45%,
+    rgba(20, 17, 14, 0.90) 63%,
+    rgba(20, 17, 14, 0.52) 78%,
+    rgba(20, 17, 14, 0.18) 90%,
+    rgba(20, 17, 14, 0) 100%);
+  transition: opacity 0.45s var(--ease);
+}
+
+.site-header.is-over-masthead.is-scrolled::before { opacity: 1; }
+
 .site-header .site-nav__link { color: var(--ink-soft); }
 .site-header .site-nav__link:hover,
 .site-header .site-nav__link:focus-visible { color: var(--ink); }
@@ -294,6 +349,7 @@ html.is-ready .boot {
    starts cream, then fades to transparent over the masthead, which reads as
    the rule under it fading away a second after load. */
 html.is-booting .site-header,
+html.is-booting .site-header::before,
 html.is-booting .site-header::after,
 html.is-booting .site-header .site-nav__link { transition: none; }
 
@@ -321,6 +377,9 @@ html.is-booting .site-header .site-nav__link { transition: none; }
 .brand {
   display: inline-flex;
   align-items: center;
+  /* a thumb needs 44px to land on reliably; the text is centred in it, so
+     the bar looks exactly as it did */
+  min-height: 44px;
   gap: 9px;
   font-family: var(--serif);
   font-size: clamp(22px, 1.9vw, 26px);
@@ -365,7 +424,11 @@ html.has-logo .brand__text { display: none; }
 
 .site-nav__link {
   position: relative;
-  display: inline-block;
+  /* flex, so the padding can carry the target to 44px without the text
+     drifting off the baseline it shares with the wordmark */
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   padding: 8px 0;
   font-size: 10.5px;
   font-weight: 500;
@@ -379,7 +442,7 @@ html.has-logo .brand__text { display: none; }
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 2px;
+  bottom: calc(50% - 0.85em);
   height: 1px;
   background: var(--gold);
   transform: scaleX(0);
@@ -404,8 +467,13 @@ html.has-logo .brand__text { display: none; }
      scroll container. */
   overflow: clip;
   isolation: isolate;
+  /* The horizon and the space under the composition are one measurement.
+     Set the height of the fade and the hero reserves room for it, so the
+     paper rises BESIDE the phones and only ever laps the last few pixels of
+     them - it can never wash over the glass, at any screen size. */
+  --horizon-h: clamp(122px, 16vh, 172px);
   padding-top: calc(var(--header-h) + clamp(40px, 7vh, 88px));
-  padding-bottom: clamp(74px, 12vh, 150px);
+  padding-bottom: calc(var(--horizon-h) - 12px);
   color: #F5EFE5;
   /* Not a flat fill: two soft pools of the lighter espresso give the ground
      depth, so the dark reads as a lit studio rather than a colour. */
@@ -427,7 +495,7 @@ html.has-logo .brand__text { display: none; }
   left: 0;
   right: 0;
   bottom: 0;
-  height: clamp(130px, 18vh, 180px);
+  height: var(--horizon-h);
   pointer-events: none;
   background:
     /* champagne hanging in the air, pooled under the centre phone */
@@ -870,8 +938,12 @@ html.is-ready .hero__stage {
   text-transform: uppercase;
   color: var(--ink-soft);
 }
+/* An icon fills its em box; uppercase letters fill only their cap height,
+   which for this face is about 0.73em. Sizing the icon in px next to 9px
+   caps therefore drew it half again too large. In em it tracks the label at
+   every breakpoint and reads as the same weight as the letters beside it. */
 .features__item .ico {
-  font-size: 10.5px;
+  font-size: 0.88em;
   color: var(--accent);
 }
 
@@ -957,7 +1029,7 @@ html.is-ready .hero__stage {
   transform-origin: bottom;
   transition: transform 0.55s var(--ease-soft);
 }
-.btn .ico { font-size: 13px; }
+.btn .ico { font-size: 1.16em; }
 
 .btn:hover,
 .btn:focus-visible {
@@ -1599,6 +1671,7 @@ html.has-logo .site-footer__logo { display: block; }
 .social__link {
   display: inline-flex;
   align-items: center;
+  min-height: 44px;
   gap: 9px;
   padding: 9px 2px;
   font-size: 10.5px;
@@ -1982,6 +2055,7 @@ html.is-ready .signature--hero {
 .hero__explore {
   display: inline-flex;
   align-items: center;
+  min-height: 44px;
   gap: 14px;
   margin-top: clamp(28px, 4.5vh, 46px);
   padding: 10px 2px;

@@ -23,6 +23,14 @@ var Preview = (function () {
 
   var store = new WeakMap();
   var all = [];
+
+  /* Sources that have already failed once on this page, keyed by URL rather
+     than by element. A 404 is not cached as an answer, so without this the
+     hero rotation - which re-opens a preview every few seconds - asks the
+     network for the same missing file for as long as the page is left open.
+     On a phone that is a steady trickle of data and radio wake-ups for a
+     file that was never going to arrive. */
+  var deadSources = {};
   var loadObserver = null;
   var playObserver = null;
   var supportsIO = typeof window.IntersectionObserver === 'function';
@@ -42,6 +50,7 @@ var Preview = (function () {
       coming: screen.querySelector('.phone__coming'),
       src: '',
       posterSrc: '',
+      requestedSrc: '',
       requested: false,
       failed: false,
       wired: false
@@ -54,6 +63,18 @@ var Preview = (function () {
 
   function showComingSoon(item) {
     if (item.coming) { item.coming.hidden = false; }
+  }
+
+  /* What a screen shows when its video will not play: the poster if there is
+     a usable one, and otherwise the "Preview coming soon" plate. */
+  function fallBack(item) {
+    var img = item.poster;
+    var posterUsable = img &&
+                       img.style.display !== 'none' &&
+                       img.complete &&
+                       img.naturalWidth > 0;
+
+    if (!posterUsable) { showComingSoon(item); }
   }
 
   function hideComingSoon(item) {
@@ -138,19 +159,18 @@ var Preview = (function () {
     /* preview.mp4 missing, unsupported or unreachable */
     video.addEventListener('error', function () {
       item.failed = true;
+
+      /* Recorded against the URL that was actually asked for, not item.src,
+         which a later open() may already have moved on to. */
+      if (item.requestedSrc) { deadSources[item.requestedSrc] = true; }
+
       video.classList.remove('is-ready');
       video.removeAttribute('src');
 
       /* Fall back to the poster if there is one. If there is not - a
          video-only template whose video will not load - the screen must say
          so rather than sit blank. */
-      var img = item.poster;
-      var posterUsable = img &&
-                         img.style.display !== 'none' &&
-                         img.complete &&
-                         img.naturalWidth > 0;
-
-      if (!posterUsable) { showComingSoon(item); }
+      fallBack(item);
     });
 
     video.addEventListener('contextmenu', function (event) {
@@ -162,7 +182,16 @@ var Preview = (function () {
     var video = item.video;
     if (!video || item.requested || item.failed || !item.src) { return; }
 
+    /* Already known to be missing: go straight to the placeholder rather
+       than ask the network a second time. */
+    if (deadSources[item.src]) {
+      item.failed = true;
+      fallBack(item);
+      return;
+    }
+
     item.requested = true;
+    item.requestedSrc = item.src;
     video.setAttribute('preload', 'auto');
     video.setAttribute('src', item.src);
 
@@ -174,6 +203,9 @@ var Preview = (function () {
     if (!video || item.failed || !item.src) { return; }
 
     loadVideo(item);
+    /* loadVideo may have just recognised a source that cannot load */
+    if (item.failed) { return; }
+
     video.muted = true;
 
     var attempt = video.play();
@@ -306,7 +338,9 @@ var Preview = (function () {
 
     item.src = opts.src || '';
     item.posterSrc = opts.poster || '';
-    item.failed = false;
+    /* A fresh element state, but not a fresh memory: a source this page has
+       already seen fail stays failed. */
+    item.failed = !!(item.src && deadSources[item.src]);
     item.requested = false;
 
     if (item.video) {
@@ -318,6 +352,9 @@ var Preview = (function () {
 
     wireVideo(item);
     wirePoster(item);
+
+    if (item.failed) { fallBack(item); return; }
+
     play(item);
   }
 
@@ -328,9 +365,15 @@ var Preview = (function () {
     release(item);
   }
 
+  /* So the hero rotation can skip pre-warming a file that is not there */
+  function isDead(src) {
+    return !!(src && deadSources[src]);
+  }
+
   return {
     mount: mount,
     open: open,
-    close: close
+    close: close,
+    isDead: isDead
   };
 }());

@@ -665,6 +665,10 @@
 
       header.classList.toggle('is-over-masthead', overMasthead);
       header.classList.toggle('is-stuck', !overMasthead && y > 8);
+      /* Drives the scrim under the bar. At rest the masthead is untouched;
+         the moment the page moves, the scrim separates the navigation from
+         the hero copy sliding under it. */
+      header.classList.toggle('is-scrolled', y > 8);
     }
 
     window.addEventListener('scroll', update, { passive: true });
