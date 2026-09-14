@@ -1,0 +1,362 @@
+/* =========================================================================
+   RAGAHRU — responsive layer
+   Loaded AFTER style.css, so everything here overrides the desktop defaults.
+
+   Phones per row
+     1441px and up ...... 4
+     1200 - 1440px ...... 4
+     1024 - 1199px ...... 3
+      900 - 1023px ...... 3
+      600 -  899px ...... 2
+      431 -  599px ...... 2
+      430px and below ... 1  (one large, appreciable phone)
+   ========================================================================= */
+
+/* ---------- large desktop ---------- */
+@media (min-width: 1441px) {
+  :root { --phone-h: 340px; }
+}
+
+/* ---------- desktop ---------- */
+@media (max-width: 1440px) {
+  :root { --phone-h: 320px; }
+}
+
+@media (max-width: 1280px) {
+  :root { --phone-h: 308px; }
+}
+
+@media (max-width: 1200px) {
+  :root { --phone-h: 296px; }
+  .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+/* ---------- landscape tablet ---------- */
+@media (max-width: 1024px) {
+  :root { --phone-h: 288px; }
+
+  .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+  /* the modal stacks: phone above, details below, both centred */
+  .modal__panel {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    text-align: center;
+    max-width: 540px;
+    gap: 30px;
+    padding-top: 58px;
+  }
+  .phone--large { --phone-h: min(56vh, 470px); }
+  .modal__desc { margin-inline: auto; }
+  .modal__info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .features--modal,
+  .price--modal { justify-content: center; }
+}
+
+/* ---------- portrait tablet ---------- */
+@media (max-width: 899px) {
+  :root { --phone-h: 286px; }
+
+
+  :root { --header-h: 70px; }
+  .brand { font-size: 18px; letter-spacing: 0.2em; }
+  .site-nav__link { font-size: 9.5px; letter-spacing: 0.2em; }
+
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  .collection__head { gap: 14px; }
+  .collection__count { display: none; }
+}
+
+@media (max-width: 768px) {
+  :root { --phone-h: 272px; }
+}
+
+/* ---------- large phone, two up ---------- */
+@media (max-width: 600px) {
+  :root { --phone-h: 246px; }
+
+  .grid { gap: 46px 18px; }
+
+  /* the header is fixed, so the masthead must always clear it */
+  /* the hero stops short of a full screen, so the collections below are
+     visibly there rather than hidden past the fold */
+  .hero {
+    padding-top: calc(var(--header-h) + 26px);
+    padding-bottom: 54px;
+  }
+  .hero__sub { margin-top: 16px; }
+  .hero__note { margin-top: 14px; }
+  .hero__explore { margin-top: 22px; }
+  .hero__wordmark { letter-spacing: 0.42em; padding-left: 0.42em; }
+
+  .card__name { margin-top: 22px; font-size: 1.16rem; }
+  .card__desc { font-size: 12px; max-width: 26ch; }
+  .features { margin-top: 13px; }
+  .features__item { font-size: 9px; letter-spacing: 0.13em; }
+  .features__item .ico { font-size: 10px; }
+  .features__item + .features__item { margin-left: 9px; }
+  .features__item + .features__item::before { margin-right: 9px; }
+  .price { margin-top: 15px; gap: 9px; }
+  .price__now { font-size: 16px; }
+  .price__was { font-size: 11px; }
+  .card__cta {
+    margin-top: 18px;
+    padding: 13px 12px;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+  }
+  .card__cta .ico { font-size: 11px; }
+
+  .phone--large { --phone-h: min(54vh, 430px); }
+  .modal__close { top: 2px; right: 2px; width: 42px; height: 42px; }
+  .modal__hint { display: none; }
+}
+
+@media (max-width: 480px) {
+  :root { --phone-h: 232px; }
+}
+
+/* ---------- one large phone per row ---------- */
+@media (max-width: 430px) {
+  :root { --phone-h: 340px; }
+
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 58px;
+  }
+
+  .site-nav__list { gap: 16px; }
+  .brand { font-size: 17px; }
+
+  .hero__title { font-size: clamp(2.3rem, 11vw, 3rem); }
+  .hero__sub { font-size: 12.5px; max-width: 32ch; }
+
+  .card__name { margin-top: 26px; font-size: 1.3rem; }
+  .card__desc { font-size: 12.5px; max-width: 30ch; }
+  .features__item { font-size: 9px; letter-spacing: 0.18em; }
+  .features__item + .features__item { margin-left: 13px; }
+  .features__item + .features__item::before { margin-right: 13px; }
+  .price__now { font-size: 18px; }
+  .card__cta {
+    max-width: 262px;
+    padding: 14px 18px;
+    font-size: 9.5px;
+    letter-spacing: 0.2em;
+  }
+
+  .phone--large { --phone-h: min(52vh, 400px); }
+  .modal__panel { padding-top: 56px; }
+  .modal__title { font-size: 1.75rem; }
+  .modal__desc { font-size: 12.5px; }
+}
+
+/* ---------- 360px and narrower ---------- */
+@media (max-width: 375px) {
+  :root { --phone-h: 320px; --gutter: 20px; }
+
+  :root { --header-h: 64px; }
+  .site-header__inner { gap: 14px; }
+  .brand { font-size: 15px; letter-spacing: 0.16em; }
+  .site-nav__link { font-size: 9px; letter-spacing: 0.16em; }
+  .site-nav__list { gap: 13px; }
+}
+
+@media (max-width: 340px) {
+  :root { --phone-h: 296px; }
+
+  :root { --header-h: 96px; }
+  .site-header__inner {
+    flex-direction: column;
+    gap: 8px;
+    padding-block: 12px;
+  }
+  .hero__title { font-size: 2.05rem; }
+}
+
+/* ---------- short landscape screens ---------- */
+@media (max-height: 640px) and (orientation: landscape) {
+  .modal__panel {
+    grid-template-columns: auto minmax(210px, 330px);
+    text-align: left;
+    padding-top: clamp(22px, 3vw, 44px);
+  }
+  .modal__info { align-items: flex-start; }
+  .features--modal,
+  .price--modal { justify-content: flex-start; }
+  .modal__desc { display: none; }
+  .phone--large { --phone-h: min(80vh, 380px); }
+}
+
+
+/* =========================================================================
+   HERO — two zones on desktop, stacked below.
+   Loaded last, so these win over the general hero rules above.
+   The side offset is written into each transform in full (never via a
+   custom property, which a transitioned transform will not re-resolve on
+   resize); that offset is what keeps the composition inside a narrow screen.
+   ========================================================================= */
+
+@media (max-width: 1200px) {
+  .hero__stage {
+    --hero-phone-h: clamp(232px, 24.5vw, 312px);
+  }
+
+  .hero__stage .hero__phone[data-pos="left"] {
+    transform: translate(-50%, -50%) translate3d(calc(-1 * clamp(74px, 9vw, 118px)), 14px, 0) scale(0.78);
+  }
+  .hero__stage .hero__phone[data-pos="right"] {
+    transform: translate(-50%, -50%) translate3d(clamp(74px, 9vw, 118px), 14px, 0) scale(0.78);
+  }
+}
+
+@media (max-width: 1024px) {
+  .hero__inner { gap: clamp(20px, 3vw, 40px); }
+  .hero__stage {
+    --hero-phone-h: clamp(214px, 25vw, 276px);
+  }
+  .hero__title { font-size: clamp(1.95rem, 4.2vw, 2.9rem); }
+
+  .hero__stage .hero__phone[data-pos="left"] {
+    transform: translate(-50%, -50%) translate3d(calc(-1 * clamp(64px, 8vw, 96px)), 14px, 0) scale(0.78);
+  }
+  .hero__stage .hero__phone[data-pos="right"] {
+    transform: translate(-50%, -50%) translate3d(clamp(64px, 8vw, 96px), 14px, 0) scale(0.78);
+  }
+}
+
+/* ---- stacked: headline first, then the composition ---- */
+@media (max-width: 899px) {
+  .hero__inner {
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(38px, 7vw, 62px);
+    justify-items: center;
+  }
+
+  .hero__copy {
+    width: 100%;
+    max-width: 34rem;
+  }
+
+  .hero__stage {
+    width: 100%;
+    max-width: 30rem;
+    --hero-phone-h: clamp(238px, 40vw, 300px);
+    /* less headroom than on desktop: stacked, the empty stage reads as a gap */
+    height: calc(var(--hero-phone-h) * 1.14);
+  }
+
+  /* the vertical hairline is a desktop flourish; stacked it just adds space */
+  .hero__rule { display: none; }
+
+  .hero__title { font-size: clamp(2.1rem, 5.6vw, 3rem); }
+  .hero__sub { max-width: 40ch; }
+
+  .hero__stage .hero__phone[data-pos="left"] {
+    transform: translate(-50%, -50%) translate3d(calc(-1 * clamp(78px, 12vw, 116px)), 14px, 0) scale(0.78);
+  }
+  .hero__stage .hero__phone[data-pos="right"] {
+    transform: translate(-50%, -50%) translate3d(clamp(78px, 12vw, 116px), 14px, 0) scale(0.78);
+  }
+}
+
+@media (max-width: 600px) {
+  .hero__inner { gap: 26px; }
+
+  /* stacked, the inline separator ends up dangling at a line break */
+  .hero__note {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 7px;
+    font-size: 10.5px;
+    letter-spacing: 0.09em;
+  }
+  .hero__note-sep { display: none; }
+  .hero__stage {
+    --hero-phone-h: clamp(190px, 42vw, 244px);
+    height: calc(var(--hero-phone-h) * 1.06);
+  }
+  .hero__title { font-size: clamp(2rem, 8.4vw, 2.6rem); }
+  .hero__sub { font-size: 12.5px; max-width: 36ch; }
+  .hero__wordmark { letter-spacing: 0.42em; }
+
+  .hero__stage .hero__phone[data-pos="left"] {
+    transform: translate(-50%, -50%) translate3d(calc(-1 * clamp(60px, 15vw, 92px)), 14px, 0) scale(0.74);
+  }
+  .hero__stage .hero__phone[data-pos="right"] {
+    transform: translate(-50%, -50%) translate3d(clamp(60px, 15vw, 92px), 14px, 0) scale(0.74);
+  }
+}
+
+@media (max-width: 430px) {
+  .hero__stage {
+    --hero-phone-h: 238px;
+  }
+  .hero__title { font-size: clamp(1.95rem, 9.2vw, 2.4rem); }
+  .hero__sub { max-width: 32ch; }
+
+  .hero__stage .hero__phone[data-pos="left"] {
+    transform: translate(-50%, -50%) translate3d(calc(-1 * 76px), 14px, 0) scale(0.74);
+  }
+  .hero__stage .hero__phone[data-pos="right"] {
+    transform: translate(-50%, -50%) translate3d(76px, 14px, 0) scale(0.74);
+  }
+}
+
+@media (max-width: 375px) {
+  .hero__stage {
+    --hero-phone-h: 222px;
+  }
+  .hero__title { font-size: 1.86rem; }
+
+  .hero__stage .hero__phone[data-pos="left"] {
+    transform: translate(-50%, -50%) translate3d(calc(-1 * 68px), 14px, 0) scale(0.74);
+  }
+  .hero__stage .hero__phone[data-pos="right"] {
+    transform: translate(-50%, -50%) translate3d(68px, 14px, 0) scale(0.74);
+  }
+}
+
+@media (max-width: 340px) {
+  .hero__stage {
+    --hero-phone-h: 204px;
+  }
+  .hero__title { font-size: 1.72rem; }
+
+  .hero__stage .hero__phone[data-pos="left"] {
+    transform: translate(-50%, -50%) translate3d(calc(-1 * 60px), 14px, 0) scale(0.74);
+  }
+  .hero__stage .hero__phone[data-pos="right"] {
+    transform: translate(-50%, -50%) translate3d(60px, 14px, 0) scale(0.74);
+  }
+}
+
+/* short landscape: the composition would dominate, so it steps back */
+@media (max-height: 620px) and (orientation: landscape) and (min-width: 700px) {
+  .hero__stage { --hero-phone-h: clamp(190px, 30vh, 240px); }
+}
+
+/* =========================================================================
+   TEMPLATE SEPARATORS
+   The rule sits to the LEFT of a card, so it is switched off for whichever
+   card starts a row — and that changes with the column count.
+   ========================================================================= */
+
+@media (max-width: 1024px) {
+  .card:nth-child(4n + 1)::before { display: block; }
+  .card:nth-child(3n + 1)::before { display: none; }
+}
+
+@media (max-width: 899px) {
+  .card:nth-child(3n + 1)::before { display: block; }
+  .card:nth-child(2n + 1)::before { display: none; }
+}
+
+/* one card per row: nothing sits beside it to divide */
+@media (max-width: 430px) {
+  .card::before { display: none; }
+}

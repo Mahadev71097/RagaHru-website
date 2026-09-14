@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <rect width="64" height="64" rx="13" fill="#171310"/>
+  <text x="31" y="44" text-anchor="middle"
+        font-family="Cormorant Garamond, Georgia, serif"
+        font-size="36" fill="#E0D2B9">R</text>
+  <circle cx="47" cy="43" r="2.2" fill="#A5834F"/>
+</svg>

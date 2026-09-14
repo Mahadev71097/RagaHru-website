@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RagaHru — Premium Digital Wedding Invitations</title>
+<meta name="description" content="RagaHru — the invitation, beautifully reimagined. Premium wedding websites for Hindu, Christian and Islamic ceremonies.">
+<meta name="theme-color" content="#211C18">
+<meta name="robots" content="index, follow">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="RagaHru">
+<meta property="og:title" content="RagaHru">
+<meta property="og:description" content="The invitation, beautifully reimagined. Premium wedding websites for Hindu, Christian and Islamic ceremonies.">
+<meta property="og:image" content="assets/logo/logo.svg">
+
+<link rel="icon" href="assets/logo/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/logo/favicon.svg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Playfair+Display:wght@500;600&family=Inter:wght@300;400;500;600&display=swap">
+
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/responsive.css">
+
+<script>
+  /* Held for a single beat so the opening sequence starts from stillness.
+     Without scripting this class is never set and the page shows normally.
+     The timer is the safety net: even if a later script fails, the staged
+     items are released and nothing can stay hidden. */
+  (function () {
+    var root = document.documentElement;
+    root.className += " is-booting";
+    window.setTimeout(function () {
+      if (root.className.indexOf("is-ready") === -1) {
+        root.className += " is-ready";
+      }
+      root.className = root.className.split("is-booting").join("");
+    }, 1500);
+  }());
+</script>
+</head>
+
+<body>
+<!-- Season sale: shown once per browsing session, about four seconds -->
+<div class="sale" id="season-sale" role="dialog" aria-modal="true" aria-label="RagaHru season sale" hidden>
+  <div class="sale__inner">
+    <!-- The offer plate. Prices live here, in one place: edit them together
+         with the Save figure if the offer ever changes. -->
+    <div class="sale__plate">
+      <img class="sale__logo" data-logo alt="RagaHru" draggable="false">
+      <p class="sale__wordmark">RagaHru</p>
+
+      <span class="sale__rule" aria-hidden="true"></span>
+
+      <p class="sale__eyebrow">Season Sale</p>
+
+      <p class="sale__price">
+        <span class="sale__was">&#8377;1,499</span>
+        <span class="sale__now">&#8377;999</span>
+      </p>
+
+      <p class="sale__save">Save &#8377;500</p>
+
+      <span class="sale__rule sale__rule--wide" aria-hidden="true"></span>
+
+      <p class="sale__line">10&ndash;20 min live-ready wedding website.</p>
+      <p class="sale__tag">Create. Share. Celebrate.</p>
+    </div>
+  </div>
+
+  <button class="sale__skip" type="button" id="sale-skip">Skip</button>
+</div>
+
+<div class="veil" aria-hidden="true"></div>
+
+<a class="skip-link" href="#collections">Skip to the collections</a>
+
+<header class="site-header boot" style="--boot-delay:120ms" id="top">
+  <div class="wrap site-header__inner">
+    <a class="brand" href="#top" aria-label="RagaHru — home">
+      <img class="brand__logo" data-logo alt="RagaHru" draggable="false">
+      <span class="brand__text">RagaHru<span class="brand__dot" aria-hidden="true"></span></span>
+    </a>
+
+    <nav class="site-nav boot" style="--boot-delay:520ms" aria-label="Wedding collections">
+      <ul class="site-nav__list">
+        <li><a class="site-nav__link" href="#hindu">Hindu</a></li>
+        <li><a class="site-nav__link" href="#christian">Christian</a></li>
+        <li><a class="site-nav__link" href="#islamic">Islamic</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero" aria-labelledby="hero-title">
+
+    <!-- Optional background film. It stays hidden until a real file loads,
+         so the hero is unchanged when assets/hero/hero.mp4 is absent. -->
+    <video class="hero__bg" id="hero-bg" aria-hidden="true"
+           muted loop playsinline preload="none"
+           disablepictureinpicture
+           controlslist="nodownload noplaybackrate noremoteplayback"></video>
+
+    <!-- the espresso ground, kept ON TOP of the film so the dual tone and the
+         headline contrast never depend on what the video happens to show -->
+    <span class="hero__tint" aria-hidden="true"></span>
+
+    <div class="wrap hero__inner">
+
+      <div class="hero__copy">
+        <p class="hero__wordmark boot" style="--boot-delay:150ms">RagaHru</p>
+
+        <!-- the champagne line draws itself open, the RagaHru signature -->
+        <span class="signature signature--hero" aria-hidden="true"></span>
+
+        <h1 class="hero__title" id="hero-title">
+          <span class="hero__line boot" style="--boot-delay:450ms">The invitation,</span>
+          <em class="hero__line boot" style="--boot-delay:560ms">beautifully reimagined.</em>
+        </h1>
+
+        <p class="hero__sub boot" style="--boot-delay:650ms">
+          Premium wedding websites,
+          ready to share in minutes.
+        </p>
+
+        <p class="hero__note boot" style="--boot-delay:720ms">
+          <span class="hero__note-key">10&ndash;20 min</span>
+          <span class="hero__note-sep" aria-hidden="true"></span>
+          Live-ready, and shared with friends &amp; family.
+        </p>
+
+        <a class="hero__explore boot" style="--boot-delay:950ms" href="#collections">
+          <span class="hero__explore-text">Explore wedding collections</span>
+          <span class="hero__explore-arrow" aria-hidden="true">
+            <svg viewBox="0 0 12 20" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true">
+              <path d="M6 1v17M1.5 13.5 6 18.5l4.5-5"/>
+            </svg>
+          </span>
+        </a>
+      </div>
+
+      <!-- Three phones, built by js/hero.js from the same template registry.
+           Decorative: every template is presented properly in the collections
+           below, so this showcase is hidden from assistive technology. -->
+      <div class="hero__stage" id="hero-stage" style="--boot-delay:750ms" aria-hidden="true"></div>
+
+    </div>
+  </section>
+
+  <!-- Every collection below is generated from js/templates.js -->
+  <div id="collections" class="collections" aria-live="polite"></div>
+
+  <p class="collections__empty" id="collections-empty" hidden>
+    New wedding websites are being prepared. Please check back shortly.
+  </p>
+</main>
+
+<section class="custom" aria-labelledby="custom-title">
+  <div class="wrap">
+    <div class="custom__inner">
+    <p class="custom__eyebrow reveal">Custom Build</p>
+    <h2 class="custom__title reveal" id="custom-title" style="--reveal-delay:80ms">
+      Need something personal?
+    </h2>
+    <p class="custom__desc reveal" style="--reveal-delay:150ms">
+      A wedding website designed around your story &mdash; your palette,
+      your rituals, your languages.
+    </p>
+
+    <p class="price price--custom reveal" style="--reveal-delay:210ms">
+      <span class="price__now" id="custom-price">&#8377;1,499</span>
+    </p>
+
+    <a class="btn btn--solid custom__cta reveal" id="custom-wa" style="--reveal-delay:270ms"
+       href="#" target="_blank" rel="noopener noreferrer">
+      <svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.64.08-.3-.15-1.26-.47-2.39-1.48-.88-.79-1.48-1.76-1.65-2.06-.18-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.91-2.2-.25-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.87 1.22 3.07c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.7.25-1.29.17-1.42-.07-.12-.27-.2-.57-.34M12.05 21.79h-.01c-1.77 0-3.5-.48-5.03-1.38l-.36-.22-3.74.99 1-3.65-.24-.38a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.88 9.89-9.88 2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 0 1 2.89 6.99c0 5.45-4.43 9.89-9.88 9.89m8.41-18.3A11.82 11.82 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.15 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.69 1.45c6.55 0 11.89-5.34 11.89-11.89 0-3.18-1.24-6.17-3.48-8.42"/></svg><span>Enquire on WhatsApp</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap site-footer__inner">
+    <img class="site-footer__logo" data-logo alt="RagaHru" draggable="false">
+    <p class="site-footer__brand">RagaHru</p>
+
+    <p class="site-footer__statement">
+      Digital wedding invitations,<br>
+      crafted to be remembered.
+    </p>
+
+    <ul class="social">
+      <li>
+        <a class="social__link" id="footer-instagram" href="#" target="_blank" rel="noopener noreferrer">
+          <svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.59-.07 4.85c-.06 1.17-.26 1.81-.42 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.07.36-2.24.41-1.27.06-1.65.07-4.86.07s-3.59-.01-4.86-.07c-1.17-.06-1.82-.26-2.24-.42-.57-.22-.96-.48-1.38-.9-.42-.42-.69-.82-.9-1.38-.16-.42-.36-1.07-.42-2.24-.04-1.26-.06-1.65-.06-4.84s.02-3.59.06-4.86c.06-1.17.26-1.81.42-2.23.21-.57.48-.96.9-1.38.42-.42.81-.69 1.38-.9.42-.17 1.05-.36 2.22-.42 1.28-.05 1.65-.06 4.86-.06zM12 0C8.74 0 8.33.02 7.05.07 5.78.13 4.9.33 4.14.63c-.79.31-1.46.72-2.13 1.38S.94 3.35.63 4.14C.33 4.9.13 5.78.07 7.05.02 8.33 0 8.74 0 12s.02 3.67.07 4.95c.06 1.27.26 2.15.56 2.91.31.79.72 1.46 1.38 2.13.67.67 1.34 1.08 2.13 1.38.76.3 1.64.5 2.91.56C8.33 23.99 8.74 24 12 24s3.67-.02 4.95-.07c1.28-.06 2.15-.26 2.91-.56.79-.31 1.46-.72 2.13-1.38.67-.67 1.08-1.34 1.38-2.13.3-.76.5-1.64.56-2.91.06-1.28.07-1.69.07-4.95s-.02-3.67-.07-4.95c-.06-1.28-.26-2.15-.56-2.91-.31-.79-.72-1.46-1.38-2.13-.67-.67-1.34-1.08-2.13-1.38-.76-.3-1.64-.5-2.91-.56C15.67.02 15.26 0 12 0z"/><path d="M12 5.84a6.16 6.16 0 1 0 0 12.32 6.16 6.16 0 0 0 0-12.32zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/><circle cx="18.41" cy="5.6" r="1.44"/></svg><span>Instagram</span>
+        </a>
+      </li>
+      <li>
+        <a class="social__link" id="footer-whatsapp" href="#" target="_blank" rel="noopener noreferrer">
+          <svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.64.08-.3-.15-1.26-.47-2.39-1.48-.88-.79-1.48-1.76-1.65-2.06-.18-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.91-2.2-.25-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.87 1.22 3.07c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.7.25-1.29.17-1.42-.07-.12-.27-.2-.57-.34M12.05 21.79h-.01c-1.77 0-3.5-.48-5.03-1.38l-.36-.22-3.74.99 1-3.65-.24-.38a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.88 9.89-9.88 2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 0 1 2.89 6.99c0 5.45-4.43 9.89-9.88 9.89m8.41-18.3A11.82 11.82 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.15 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.69 1.45c6.55 0 11.89-5.34 11.89-11.89 0-3.18-1.24-6.17-3.48-8.42"/></svg><span>WhatsApp</span>
+        </a>
+      </li>
+    </ul>
+
+    <p class="site-footer__note">
+      Every preview, design and layout shown here is original work and remains
+      the property of RagaHru. Reproduction is not permitted.
+    </p>
+    <p class="site-footer__copy">&copy; <span id="footer-year">2026</span> RagaHru. All rights reserved.</p>
+  </div>
+</footer>
+
+<!-- ============ LARGE PREVIEW MODAL ============ -->
+<div class="modal" id="preview-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" hidden>
+  <div class="modal__backdrop" data-modal-close></div>
+
+  <div class="modal__panel" role="document">
+    <button class="modal__close" type="button" data-modal-close aria-label="Close preview">
+      <svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M18.3 5.7 12 12l-6.3-6.3-1.4 1.4 6.3 6.3-6.3 6.3 1.4 1.4 6.3-6.3 6.3 6.3 1.4-1.4-6.3-6.3 6.3-6.3z"/></svg>
+    </button>
+
+    <div class="modal__stage">
+      <div class="phone phone--large" id="modal-phone">
+        <div class="phone__body">
+          <div class="phone__screen">
+            <img class="phone__poster" id="modal-poster" alt="" draggable="false">
+            <video class="phone__video" id="modal-video"
+                   muted loop playsinline autoplay preload="none"
+                   disablepictureinpicture controlslist="nodownload noplaybackrate noremoteplayback"></video>
+            <p class="phone__coming" id="modal-coming" hidden>Preview<br>coming soon</p>
+            <span class="phone__sheen" aria-hidden="true"></span>
+            <span class="watermark watermark--large" aria-hidden="true">RagaHru</span>
+          </div>
+        </div>
+        <span class="phone__shadow" aria-hidden="true"></span>
+      </div>
+    </div>
+
+    <div class="modal__info">
+      <p class="modal__eyebrow" id="modal-eyebrow" style="--i:0">Hindu Weddings</p>
+      <h2 class="modal__title" id="modal-title" style="--i:1">Template</h2>
+      <p class="modal__desc selectable" id="modal-desc" style="--i:2"></p>
+
+      <ul class="features features--modal" id="modal-features" style="--i:3"></ul>
+
+      <p class="price price--modal" style="--i:4">
+        <span class="price__now" id="modal-price"></span>
+        <span class="price__was" id="modal-original"></span>
+      </p>
+
+      <a class="btn btn--solid" id="modal-wa" style="--i:5" href="#" target="_blank" rel="noopener noreferrer">
+        <svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.64.08-.3-.15-1.26-.47-2.39-1.48-.88-.79-1.48-1.76-1.65-2.06-.18-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.91-2.2-.25-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.87 1.22 3.07c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.7.25-1.29.17-1.42-.07-.12-.27-.2-.57-.34M12.05 21.79h-.01c-1.77 0-3.5-.48-5.03-1.38l-.36-.22-3.74.99 1-3.65-.24-.38a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.88 9.89-9.88 2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 0 1 2.89 6.99c0 5.45-4.43 9.89-9.88 9.89m8.41-18.3A11.82 11.82 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.15 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.69 1.45c6.55 0 11.89-5.34 11.89-11.89 0-3.18-1.24-6.17-3.48-8.42"/></svg>
+        <span>Enquire on WhatsApp</span>
+      </a>
+
+      <p class="modal__hint" style="--i:6">Press <kbd>Esc</kbd> to close</p>
+    </div>
+  </div>
+</div>
+
+<script src="config/site-config.js"></script>
+<script src="js/templates.js"></script>
+<script src="js/sale.js"></script>
+<script src="js/preview.js"></script>
+<script src="js/hero.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
