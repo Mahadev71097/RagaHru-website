@@ -943,7 +943,11 @@ html.is-ready .hero__stage {
    caps therefore drew it half again too large. In em it tracks the label at
    every breakpoint and reads as the same weight as the letters beside it. */
 .features__item .ico {
-  font-size: 0.88em;
+  /* Uppercase letters fill about 0.73em of their box while an icon fills the
+     whole of its own, so a mark set at the label's own size always draws
+     bigger than the words. Just above the cap height is where the two finally
+     read as the same weight. */
+  font-size: 0.78em;
   color: var(--accent);
 }
 

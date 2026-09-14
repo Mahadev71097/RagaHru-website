@@ -133,13 +133,17 @@
   :root { --phone-h: 232px; }
 }
 
-/* ---------- one large phone per row ---------- */
+/* ---------- two per row, the same as every wider screen ---------- */
 @media (max-width: 430px) {
-  :root { --phone-h: 340px; }
+  /* One template per row turned a collection into a long scroll with nothing
+     to compare against - the visitor had to remember the last card to judge
+     the next. Side by side, a collection is taken in at a glance and a choice
+     is made by looking, not by scrolling back. */
+  :root { --phone-h: 248px; }
 
   .grid {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 58px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 42px 16px;
   }
 
   .site-nav__list { gap: 16px; }
@@ -148,18 +152,52 @@
   .hero__title { font-size: clamp(2.3rem, 11vw, 3rem); }
   .hero__sub { font-size: 12.5px; max-width: 32ch; }
 
-  .card__name { margin-top: 26px; font-size: 1.3rem; }
-  .card__desc { font-size: 12.5px; max-width: 30ch; }
-  .features__item { font-size: 9px; letter-spacing: 0.18em; }
-  .features__item + .features__item { margin-left: 13px; }
-  .features__item + .features__item::before { margin-right: 13px; }
-  .price__now { font-size: 18px; }
-  .card__cta {
-    max-width: 262px;
-    padding: 14px 18px;
-    font-size: 9.5px;
-    letter-spacing: 0.2em;
+  /* the card is now half as wide, so its type steps down with it */
+  .card { padding-bottom: 22px; }
+  .card__name { margin-top: 16px; font-size: 1.02rem; }
+  .card__badge {
+    margin-left: 6px;
+    padding: 2px 5px 1px;
+    font-size: 7.5px;
+    letter-spacing: 0.1em;
   }
+  /* Half the width means a line holds half as much, so descriptions here run
+     to three lines where they ran to two. Reserving all three keeps the
+     feature rows, prices and buttons of the pair level with each other
+     whatever length the two descriptions happen to be. */
+  .card__desc {
+    margin-top: 7px;
+    max-width: 22ch;
+    font-size: 11px;
+    line-height: 1.6;
+    min-height: calc(3 * 1.6em);
+  }
+
+  /* Three facts will not always sit on one line in half a screen, so the
+     middots go and a gap carries the rhythm instead: a line that wraps then
+     reads as a second row rather than one beginning with a stray dot.
+     Scoped to the card: the modal is full width and keeps its own line. */
+  .card .features { margin-top: 11px; gap: 5px 9px; }
+  .card .features__item { font-size: 8.5px; letter-spacing: 0.07em; }
+  .card .features__item + .features__item { margin-left: 0; }
+  .card .features__item + .features__item::before { display: none; }
+
+  .card .price { margin-top: 12px; gap: 7px; }
+  .card .price__from { font-size: 8px; }
+  .card .price__now { font-size: 15px; }
+  .card .price__was { font-size: 11px; }
+
+  .card__cta {
+    max-width: none;
+    /* the type is smaller here, so the box is held open to stay a 44px
+       target rather than shrinking with the label */
+    min-height: 44px;
+    margin-top: 14px;
+    padding: 12px 8px;
+    font-size: 8.5px;
+    letter-spacing: 0.1em;
+  }
+  .card .link-cta { font-size: 8.5px; letter-spacing: 0.12em; }
 
   .phone--large { --phone-h: min(52vh, 400px); }
   .modal__panel { padding-top: 56px; }
@@ -169,7 +207,9 @@
 
 /* ---------- 360px and narrower ---------- */
 @media (max-width: 375px) {
-  :root { --phone-h: 320px; --gutter: 20px; }
+  :root { --phone-h: 214px; --gutter: 20px; }
+
+  .grid { gap: 38px 14px; }
 
   :root { --header-h: 64px; }
   .site-header__inner { gap: 14px; }
@@ -179,7 +219,11 @@
 }
 
 @media (max-width: 340px) {
-  :root { --phone-h: 296px; }
+  :root { --phone-h: 190px; }
+
+  .grid { gap: 34px 12px; }
+  .card__name { font-size: 0.95rem; }
+  .card__desc { font-size: 10.5px; max-width: 20ch; }
 
   /* The bar used to stack the wordmark over the navigation here, which cost
      120px of a 720px screen once both had a proper touch target. Measured at
@@ -370,7 +414,6 @@
   .card:nth-child(2n + 1)::before { display: none; }
 }
 
-/* one card per row: nothing sits beside it to divide */
-@media (max-width: 430px) {
-  .card::before { display: none; }
-}
+/* Two per row all the way down, so the pattern set at 899px - a rule to the
+   left of every card except the one that starts a row - still holds and
+   nothing needs to be switched off here. */

@@ -26,8 +26,9 @@ const SITE_CONFIG = {
   currencySymbol: "\u20B9",
 
   /* The message that is pre-filled in WhatsApp.
-     {template} is automatically replaced with the template name. */
-  enquiryMessage: "Hi, I need {template} design.",
+     {template} is automatically replaced with the template name, so the
+     enquiry says which design it is about in its own first line. */
+  enquiryMessage: "Hello RagaHru, I would like to enquire about {template} for our wedding. Could you please share the details and the next steps? Thank you.",
 
   /* Optional hero background video. Drop the file in and it is used; leave
      the folder empty and the hero stays as it is. */
@@ -38,7 +39,7 @@ const SITE_CONFIG = {
 
   /* Custom build: a designed-from-scratch wedding website */
   customPrice: 1499,
-  customMessage: "Hi, I need a custom wedding website design.",
+  customMessage: "Hello RagaHru, I would like to enquire about a custom-designed wedding website. Could you please share the details and the next steps? Thank you.",
 
   /* Social */
   instagramUrl: "https://www.instagram.com/ragahru?stkn=OG56d3F5OHJvdgrd&utm_source=qr",

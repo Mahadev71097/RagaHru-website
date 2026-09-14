@@ -23,7 +23,7 @@
   var CONFIG = (typeof SITE_CONFIG === 'object' && SITE_CONFIG) ? SITE_CONFIG : {};
   var BRAND = CONFIG.brandName || 'RagaHru';
   var CURRENCY = CONFIG.currencySymbol || '₹';
-  var MESSAGE = CONFIG.enquiryMessage || "Hi, I need {template} design.";
+  var MESSAGE = CONFIG.enquiryMessage || "Hello RagaHru, I would like to enquire about {template} for our wedding. Could you please share the details and the next steps? Thank you.";
   var COLLECTIONS = Array.isArray(CONFIG.collections) && CONFIG.collections.length
     ? CONFIG.collections
     : [
@@ -78,13 +78,13 @@
 
   /* ---------------------------------------------------------------------
      WhatsApp link
-     The message always carries the template name, e.g.
-     "Hi, I need Template 01 design." — so the enquiry says which
-     template it is about before a word is typed.
+     The message always carries the template name, so an enquiry arrives
+     reading as a proper note from a client — and says which design it is
+     about before the visitor has typed a word.
      --------------------------------------------------------------------- */
 
   function whatsappLink(templateName) {
-    var text = MESSAGE.replace('{template}', templateName || 'a wedding website');
+    var text = MESSAGE.replace('{template}', templateName || 'one of your designs');
     var digits = String(CONFIG.whatsappNumber || '').replace(/\D/g, '');
     var base = digits.length >= 8 ? 'https://wa.me/' + digits : 'https://wa.me/';
     return base + '?text=' + encodeURIComponent(text);
@@ -831,7 +831,7 @@
     var cta = document.getElementById('custom-wa');
     if (!cta) { return; }
 
-    var text = CONFIG.customMessage || "Hi, I need a custom wedding website design.";
+    var text = CONFIG.customMessage || "Hello RagaHru, I would like to enquire about a custom-designed wedding website. Could you please share the details and the next steps? Thank you.";
     var digits = String(CONFIG.whatsappNumber || '').replace(/\D/g, '');
     var base = digits.length >= 8 ? 'https://wa.me/' + digits : 'https://wa.me/';
 

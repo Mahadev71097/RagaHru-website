@@ -225,13 +225,14 @@ whatsappNumber: "919876543210",
 
 Every WhatsApp button on the site updates immediately. The message sent is:
 
-> Hi, I need Template 01 design.
+> Hello RagaHru, I would like to enquire about Template 01 for our wedding.
+> Could you please share the details and the next steps? Thank you.
 
 The template name changes for each card automatically, so every enquiry that
-reaches you already says which template the client wants — Template 04's card
-sends "Hi, I need Template 04 design." You can reword the message in the same
-file via `enquiryMessage` — keep `{template}` in it, that is the placeholder
-the template name is dropped into.
+reaches you reads as a proper note from a client and already says which
+template they want — Template 04's card names Template 04. You can reword the
+message in the same file via `enquiryMessage` — keep `{template}` in it, that
+is the placeholder the template name is dropped into.
 
 Until you replace the placeholder number the buttons still work; WhatsApp
 simply asks the visitor to pick a contact.
