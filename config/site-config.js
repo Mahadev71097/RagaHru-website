@@ -44,12 +44,26 @@ const SITE_CONFIG = {
   /* Social */
   instagramUrl: "https://www.instagram.com/ragahru?stkn=OG56d3F5OHJvdgrd&utm_source=qr",
 
-  /* The logo file. The first one that loads is used; if none are present the
-     refined RagaHru wordmark is shown instead, so nothing ever breaks. */
+  /* The brand artwork. The first file that loads is the one used, so the
+     lighter WebP is tried first and the PNG catches anything that cannot
+     read it. If none are present the refined RagaHru wordmark is shown
+     instead, so nothing ever breaks.
+
+     logoSources  the full lockup - monogram, name and line together. It is
+                  shown large, on the cream surfaces that suit it: the
+                  opening card and the footer.
+     markSources  the monogram on its own. The full lockup is unreadable at
+                  the height of the bar, and its maroon does not carry on the
+                  dark masthead, so the header wears the gold mark beside the
+                  RagaHru name instead. */
   logoSources: [
-    "assets/logo/ragahru-logo.png",
-    "assets/logo/ragahru-logo.jpg",
-    "assets/logo/ragahru-logo.webp"
+    "assets/logo/ragahru-logo.webp",
+    "assets/logo/ragahru-logo.png"
+  ],
+
+  markSources: [
+    "assets/logo/ragahru-mark.webp",
+    "assets/logo/ragahru-mark.png"
   ],
 
   /* Section headings, and the order the sections appear in.

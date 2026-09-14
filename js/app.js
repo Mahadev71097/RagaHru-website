@@ -730,25 +730,31 @@
      (and if no file is ever added) the RagaHru wordmark stands in, so the
      brand is never a broken image. */
   function wireLogo() {
-    var sources = Array.isArray(CONFIG.logoSources) ? CONFIG.logoSources.slice() : [];
-    var slots = document.querySelectorAll('[data-logo]');
-    if (!sources.length || !slots.length) { return; }
+    /* The full lockup where there is room for it, the monogram in the bar. */
+    fill(CONFIG.logoSources, '[data-logo]:not([data-logo="mark"])', 'has-logo');
+    fill(CONFIG.markSources, '[data-logo="mark"]', 'has-mark');
 
-    (function attempt(index) {
-      if (index >= sources.length) { return; }
+    function fill(sources, selector, flag) {
+      var list = Array.isArray(sources) ? sources.slice() : [];
+      var slots = document.querySelectorAll(selector);
+      if (!list.length || !slots.length) { return; }
 
-      var probe = new Image();
+      (function attempt(index) {
+        if (index >= list.length) { return; }
 
-      probe.onload = function () {
-        for (var i = 0; i < slots.length; i += 1) {
-          slots[i].setAttribute('src', sources[index]);
-        }
-        document.documentElement.classList.add('has-logo');
-      };
+        var probe = new Image();
 
-      probe.onerror = function () { attempt(index + 1); };
-      probe.src = sources[index];
-    }(0));
+        probe.onload = function () {
+          for (var i = 0; i < slots.length; i += 1) {
+            slots[i].setAttribute('src', list[index]);
+          }
+          document.documentElement.classList.add(flag);
+        };
+
+        probe.onerror = function () { attempt(index + 1); };
+        probe.src = list[index];
+      }(0));
+    }
   }
 
   /* The hero film. It is only revealed once a real file has decoded a frame,

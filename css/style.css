@@ -395,14 +395,17 @@ html.is-booting .site-header .site-nav__link { transition: none; }
 
 .brand__text { display: inline-flex; align-items: baseline; gap: 8px; }
 
-/* the logo appears only once a real file has loaded */
+/* The bar wears the monogram, not the full lockup: at this height the name
+   and line under the mark would be unreadable, and their maroon disappears
+   against the masthead. The gold mark carries on both the dark top of the
+   page and the cream below it - and the RagaHru wordmark STAYS beside it,
+   so the two together read as the lockup. */
 .brand__logo {
   display: none;
-  height: clamp(38px, 4.4vw, 54px);
+  height: clamp(30px, 3vw, 40px);
   width: auto;
 }
-html.has-logo .brand__logo { display: block; }
-html.has-logo .brand__text { display: none; }
+html.has-mark .brand__logo { display: block; }
 
 .brand__dot {
   width: 4px;
@@ -1478,15 +1481,18 @@ body.is-locked { overflow: hidden; }
   font-weight: 500;
   letter-spacing: 0.05em;
 }
-html.has-logo .site-footer__brand { display: none; }
 
+/* The footer stands on the espresso, so it takes the gold mark for the same
+   reason the header does - the maroon half of the full lockup, and its line,
+   simply are not there against this ground. The RagaHru name below it is set
+   in type, which is legible at any size on any tone. */
 .site-footer__logo {
   display: none;
-  height: clamp(96px, 13vw, 132px);
+  height: clamp(68px, 9.5vw, 92px);
   width: auto;
-  margin: 0 auto;
+  margin: 0 auto 10px;
 }
-html.has-logo .site-footer__logo { display: block; }
+html.has-mark .site-footer__logo { display: block; }
 
 .site-footer__statement {
   margin: 18px auto 0;
@@ -1803,10 +1809,16 @@ body.is-sale-open { overflow: hidden; }
     transform 0.58s var(--ease-hero) var(--at, 0ms);
 }
 
+/* The opening card is where the brand is introduced, so the lockup is sized
+   to command the plate rather than sit on it. It is close to square, so the
+   width is what is held and the height follows - a tall clamp would have
+   left it narrow on a phone. */
 .sale__logo {
   display: none;
-  height: clamp(150px, 30vw, 240px);
-  width: auto;
+  width: min(66%, 280px);
+  max-height: 42vh;
+  height: auto;
+  object-fit: contain;
   margin: 0 auto;
   --at: 60ms;
 }
