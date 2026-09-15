@@ -46,7 +46,7 @@
     gap: 30px;
     padding-top: 58px;
   }
-  .phone--large { --phone-h: min(56vh, 470px); }
+  .phone--large { --phone-h: min(56vh, 470px); --phone-h: min(56dvh, 470px); }
   .modal__desc { margin-inline: auto; }
   .modal__info {
     display: flex;
@@ -124,7 +124,7 @@
   }
   .card__cta .ico { font-size: 11px; }
 
-  .phone--large { --phone-h: min(54vh, 430px); }
+  .phone--large { --phone-h: min(54vh, 430px); --phone-h: min(54dvh, 430px); }
   .modal__close { top: 2px; right: 2px; width: 42px; height: 42px; }
   .modal__hint { display: none; }
 }
@@ -199,7 +199,7 @@
   }
   .card .link-cta { font-size: 8.5px; letter-spacing: 0.12em; }
 
-  .phone--large { --phone-h: min(52vh, 400px); }
+  .phone--large { --phone-h: min(52vh, 400px); --phone-h: min(52dvh, 400px); }
   .modal__panel { padding-top: 56px; }
   .modal__title { font-size: 1.75rem; }
   .modal__desc { font-size: 12.5px; }
@@ -236,6 +236,27 @@
   .hero__title { font-size: 2.05rem; }
 }
 
+/* ---------- short screens: the large preview has to fit ----------
+   Scrolling inside the modal is the safety net, not the plan. Once a phone
+   browser's toolbars are counted, the height actually on screen is around
+   700px on a device that calls itself 852 - and at the old sizes that put
+   the Enquire button just under the bottom edge, where it could be neither
+   seen nor tapped.
+
+   So on a stacked, short screen the panel is tightened: a smaller phone, less
+   air between the blocks, and the Esc hint dropped, since a visitor on a
+   touch screen has no Esc key to press. Landscape keeps its own treatment
+   further down, which is why this sits above it. */
+@media (max-width: 1024px) and (max-height: 820px) {
+  .phone--large { --phone-h: min(46vh, 360px); --phone-h: min(46dvh, 360px); }
+
+  .modal__panel { padding-top: 44px; gap: 20px; }
+  .modal__eyebrow { margin-bottom: 10px; }
+  .modal__desc { margin-top: 8px; }
+  .modal__info .btn { margin-top: 20px; }
+  .modal__hint { display: none; }
+}
+
 /* ---------- short landscape screens ---------- */
 @media (max-height: 640px) and (orientation: landscape) {
   .modal__panel {
@@ -247,7 +268,7 @@
   .features--modal,
   .price--modal { justify-content: flex-start; }
   .modal__desc { display: none; }
-  .phone--large { --phone-h: min(80vh, 380px); }
+  .phone--large { --phone-h: min(80vh, 380px); --phone-h: min(80dvh, 380px); }
 }
 
 
