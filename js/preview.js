@@ -3,19 +3,26 @@
    -------------------------------------------------------------------------
    Owns every video and poster on the page.
 
+   The rule: NOTHING on the page plays by itself. A card and a hero phone
+   show a still. A video is downloaded and played in one place only - the
+   large preview a visitor has asked for by opening it. A catalogue of fifty
+   templates therefore costs fifty small images to browse, not fifty films.
+
    What it guarantees:
-     - videos are only DOWNLOADED when they come near the viewport
-     - videos only PLAY while they are actually on screen, and pause when
-       they leave (so 50-100+ templates stay smooth)
-     - a missing preview.mp4 never breaks anything: the poster is shown
-     - a missing poster.jpg never breaks anything either: an elegant
-       "Preview coming soon" state is shown instead
-     - all playback is muted, looping, inline and without native controls
+     - posters are only DOWNLOADED when they come near the viewport
+     - a card NEVER requests a video, however long it is looked at
+     - a missing poster never breaks anything: an elegant "Preview coming
+       soon" state is shown instead
+     - a missing preview.mp4 in the large view falls back to the poster
+     - the preview runs ONCE and then offers a Play again button, rather than
+       turning over for as long as the panel is left open
+     - all playback is muted, inline and without native controls
 
    Public API
-     Preview.mount(screenEl)   lazy-loaded card preview
-     Preview.open(screenEl, { src, poster })   immediate (modal) preview
-     Preview.close(screenEl)   stop and release a modal preview
+     Preview.mount(screenEl)   lazy-loaded card still
+     Preview.still(screenEl, { poster })   a still, and only ever a still
+     Preview.open(screenEl, { src, poster })   the large view: loads, plays
+     Preview.close(screenEl)   stop and release the large view
    ========================================================================= */
 
 var Preview = (function () {
@@ -48,12 +55,17 @@ var Preview = (function () {
       video: screen.querySelector('.phone__video'),
       poster: screen.querySelector('.phone__poster'),
       coming: screen.querySelector('.phone__coming'),
+      replay: screen.querySelector('.phone__replay'),
       src: '',
       posterSrc: '',
       requestedSrc: '',
       requested: false,
       failed: false,
-      wired: false
+      wired: false,
+      /* a still-only screen never asks the network for a film */
+      stillOnly: true,
+      /* a clip that has run its course stays finished */
+      ended: false
     };
 
     store.set(screen, item);
@@ -63,6 +75,10 @@ var Preview = (function () {
 
   function showComingSoon(item) {
     if (item.coming) { item.coming.hidden = false; }
+  }
+
+  function showReplay(item, show) {
+    if (item.replay) { item.replay.hidden = !show; }
   }
 
   /* What a screen shows when its video will not play: the poster if there is
@@ -84,9 +100,33 @@ var Preview = (function () {
   /* The poster is optional. It is only a loading/fallback frame: the video is
      the preview. With no poster and a working video the screen simply stays
      dark until the first frame arrives. */
+  /* The poster is named by convention, but not everyone exports a .jpg. The
+     same name is tried as .jpg, .webp and .png so a poster saved in any of
+     the three simply works. A miss is remembered, so the alternatives are
+     never asked for twice. */
+  function posterCandidates(src) {
+    var list = [];
+    if (!src) { return list; }
+    list.push(src);
+
+    var m = String(src).match(/^(.*)\.(jpg|jpeg|png|webp)$/i);
+    if (m) {
+      var exts = ['jpg', 'webp', 'png'];
+      for (var i = 0; i < exts.length; i += 1) {
+        var alt = m[1] + '.' + exts[i];
+        if (list.indexOf(alt) === -1) { list.push(alt); }
+      }
+    }
+    return list;
+  }
+
   function wirePoster(item) {
     var img = item.poster;
     if (!img) { showComingSoon(item); return; }
+
+    var tries = posterCandidates(item.posterSrc).filter(function (src) {
+      return !deadSources[src];
+    });
 
     function ok() {
       img.style.display = '';
@@ -98,25 +138,34 @@ var Preview = (function () {
        moment it takes the first frame to decode. */
     function fail() {
       img.style.display = 'none';
-      if (item.src) { hideComingSoon(item); } else { showComingSoon(item); }
+      if (item.src && !item.stillOnly) { hideComingSoon(item); } else { showComingSoon(item); }
     }
 
-    img.onload = ok;
-    img.onerror = fail;
+    function attempt(index) {
+      if (index >= tries.length) { fail(); return; }
 
-    if (!item.posterSrc) { fail(); return; }
+      var src = tries[index];
+      img.onload = ok;
+      img.onerror = function () {
+        deadSources[src] = true;
+        attempt(index + 1);
+      };
 
-    hideComingSoon(item);
-    img.style.display = '';
+      hideComingSoon(item);
+      img.style.display = '';
+      if (img.getAttribute('src') !== src) {
+        img.setAttribute('src', src);
+      }
 
-    if (img.getAttribute('src') !== item.posterSrc) {
-      img.setAttribute('src', item.posterSrc);
+      /* the image may already have finished (or failed) before we attached */
+      if (img.complete) {
+        if (img.naturalWidth > 0) { ok(); }
+        else { deadSources[src] = true; attempt(index + 1); }
+      }
     }
 
-    /* the image may already have finished (or failed) before we attached */
-    if (img.complete) {
-      if (img.naturalWidth > 0) { ok(); } else { fail(); }
-    }
+    if (!tries.length) { fail(); return; }
+    attempt(0);
   }
 
   function wireVideo(item) {
@@ -126,7 +175,11 @@ var Preview = (function () {
 
     video.muted = true;
     video.defaultMuted = true;
-    video.loop = true;
+    /* Deliberately NOT looping. A loop that has already been downloaded costs
+       no more data, but it does keep a decoder, a GPU and a battery busy for
+       as long as the panel is open - and a preview that simply stops is a
+       calmer thing to watch than one that will not. */
+    video.loop = false;
     video.playsInline = true;
     video.setAttribute('muted', '');
     video.setAttribute('playsinline', '');
@@ -155,6 +208,29 @@ var Preview = (function () {
         video.style.opacity = '1';
       }, 1500);
     });
+
+    /* Reached the end: stop, and offer it again rather than starting over
+       uninvited. Nothing is re-downloaded when they do - the clip is already
+       in the element. */
+    video.addEventListener('ended', function () {
+      item.ended = true;
+      showReplay(item, true);
+    });
+
+    /* any fresh start hides the offer again */
+    video.addEventListener('play', function () {
+      item.ended = false;
+      showReplay(item, false);
+    });
+
+    if (item.replay) {
+      item.replay.addEventListener('click', function () {
+        showReplay(item, false);
+        try { video.currentTime = 0; } catch (err) { /* nothing to do */ }
+        var again = video.play();
+        if (again && again.catch) { again.catch(function () {}); }
+      });
+    }
 
     /* preview.mp4 missing, unsupported or unreachable */
     video.addEventListener('error', function () {
@@ -200,7 +276,12 @@ var Preview = (function () {
 
   function play(item) {
     var video = item.video;
-    if (!video || item.failed || !item.src) { return; }
+    if (!video || item.stillOnly || item.failed || !item.src) { return; }
+
+    /* It has already run once. Coming back to the tab, or scrolling it back
+       into view, must not start it over uninvited - that is what the Play
+       again button is for. */
+    if (item.ended) { return; }
 
     loadVideo(item);
     /* loadVideo may have just recognised a source that cannot load */
@@ -226,6 +307,8 @@ var Preview = (function () {
     var video = item.video;
     if (!video) { return; }
 
+    showReplay(item, false);
+    item.ended = false;
     pause(item);
     video.classList.remove('is-ready');
     video.style.opacity = '';
@@ -252,7 +335,8 @@ var Preview = (function () {
         var item = store.get(entry.target);
         if (!item) { return; }
         wirePoster(item);
-        loadVideo(item);
+        /* deliberately NOT loadVideo: a card is a still until it is opened */
+        if (!item.stillOnly) { loadVideo(item); }
         loadObserver.unobserve(entry.target);
       });
     }, { root: null, rootMargin: '320px 0px', threshold: 0 });
@@ -290,7 +374,7 @@ var Preview = (function () {
 
     for (i = 0; i < all.length; i += 1) {
       var item = all[i];
-      if (!item.src || item.failed || !item.video) { continue; }
+      if (item.stillOnly || item.ended || !item.src || item.failed || !item.video) { continue; }
       if (!item.video.getAttribute('src')) { continue; }
       if (onScreen(item.screen)) { play(item); }
     }
@@ -300,34 +384,51 @@ var Preview = (function () {
      public API
      --------------------------------------------------------------------- */
 
+  /* A card in the grid. It shows its poster and nothing else - no video is
+     requested, no video plays. The film is reached by opening the template,
+     which is what the play button on the card is for. */
   function mount(screen, options) {
     if (!screen) { return; }
 
     var opts = options || {};
     var item = record(screen);
+    item.stillOnly = true;
     item.src = screen.getAttribute('data-video') || '';
     item.posterSrc = screen.getAttribute('data-poster') || '';
-
-    wireVideo(item);
 
     if (supportsIO) {
       buildObservers();
 
-      /* the first cards are primed straight away so the top of the page is
+      /* the first row is primed straight away so the top of the page is
          never empty; everything below waits for the observer */
-      if (opts.eager) {
-        wirePoster(item);
-        play(item);
-      } else {
-        loadObserver.observe(screen);
-      }
-
-      if (item.src) { playObserver.observe(screen); }
+      if (opts.eager) { wirePoster(item); }
+      else { loadObserver.observe(screen); }
     } else {
-      /* very old browser: just load and play, still muted and looping */
       wirePoster(item);
-      play(item);
     }
+  }
+
+  /* A screen that is only ever a still - the hero phones. It is handed its
+     poster directly rather than reading one off the element, because the
+     hero changes which template a phone is showing as it rotates. */
+  function still(screen, options) {
+    if (!screen) { return; }
+
+    var opts = options || {};
+    var item = record(screen);
+    item.stillOnly = true;
+    item.src = '';
+    item.posterSrc = opts.poster || '';
+    item.failed = false;
+    item.requested = false;
+
+    if (item.video) {
+      pause(item);
+      item.video.classList.remove('is-ready');
+      item.video.removeAttribute('src');
+    }
+
+    wirePoster(item);
   }
 
   function open(screen, options) {
@@ -336,6 +437,9 @@ var Preview = (function () {
     var item = record(screen);
     var opts = options || {};
 
+    item.stillOnly = false;   /* the large view is the one place film plays */
+    item.ended = false;
+    showReplay(item, false);
     item.src = opts.src || '';
     item.posterSrc = opts.poster || '';
     /* A fresh element state, but not a fresh memory: a source this page has
@@ -372,6 +476,7 @@ var Preview = (function () {
 
   return {
     mount: mount,
+    still: still,
     open: open,
     close: close,
     isDead: isDead

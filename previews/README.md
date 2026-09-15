@@ -8,12 +8,12 @@ keep raw screen recordings and exports while you are preparing them.
 ## The workflow
 
 1. Record or export the raw video of a wedding website here, for example
-   `previews/template-04-raw.mov`.
+   `previews/HN03-raw.mov`.
 2. Trim it, resize it to **1080 x 1920** and export it as **H.264 MP4**.
 3. Move the finished video into the template's own folder:
 
    ```
-   templates/template-04/preview/preview.mp4
+   templates/hindu/HN03/preview/preview.mp4
    ```
 
 4. Add the template to `js/templates.js` — see the main README, section 3.

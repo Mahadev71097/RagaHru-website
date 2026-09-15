@@ -9,6 +9,18 @@ assets/hero/hero.mp4
 That is the only file needed. Drop it in and refresh — nothing else to edit.
 The path can be changed with `heroVideo` in `config/site-config.js`.
 
+Put a still beside it as well:
+
+```
+assets/hero/hero-poster.jpg
+```
+
+It is shown the instant the page opens, so the masthead is never dark while
+the film is still arriving, and it is what someone who has asked for reduced
+motion sees instead of the loop. Export it as **a frame of the film itself,
+at the film's own size** — otherwise the first decoded frame jumps. Named by
+`heroPoster` in the same config file.
+
 ## How it behaves
 
 - It sits **behind** the espresso ground, under a warm scrim, so the dual-tone

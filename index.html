@@ -136,7 +136,7 @@
         <p class="hero__note boot" style="--boot-delay:720ms">
           <span class="hero__note-key">Website live in 24 hours</span>
           <span class="hero__note-sep" aria-hidden="true"></span>
-          Ready to share with friends &amp; family.
+          <span class="hero__note-rest">Ready to share with friends &amp; family</span>
         </p>
 
         <a class="hero__explore boot" style="--boot-delay:950ms" href="#collections">
@@ -238,11 +238,20 @@
         <div class="phone__body">
           <div class="phone__screen">
             <img class="phone__poster" id="modal-poster" alt="" draggable="false">
+            <!-- no `loop`: the preview runs once and then offers itself again,
+                 rather than turning over in the background for as long as the
+                 panel happens to be open -->
             <video class="phone__video" id="modal-video"
-                   muted loop playsinline autoplay preload="none"
+                   muted playsinline autoplay preload="none"
                    disablepictureinpicture controlslist="nodownload noplaybackrate noremoteplayback"></video>
             <p class="phone__coming" id="modal-coming" hidden>Preview<br>coming soon</p>
             <span class="phone__sheen" aria-hidden="true"></span>
+            <button class="phone__replay" id="modal-replay" type="button" hidden>
+              <span class="phone__replay-mark" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M20.5 12a8.5 8.5 0 1 1-2.6-6.1"/><path d="M20.7 4.2v4.6h-4.6"/></svg>
+              </span>
+              <span class="phone__replay-text">Play again</span>
+            </button>
             <span class="watermark watermark--large" aria-hidden="true">RagaHru</span>
           </div>
         </div>

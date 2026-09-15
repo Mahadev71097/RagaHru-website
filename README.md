@@ -25,7 +25,7 @@ Cloudflare Pages or any other static host.
 │
 ├── js/
 │   ├── templates.js            THE TEMPLATE REGISTRY — you edit this one
-│   ├── preview.js              video loading, autoplay, pause, fallbacks
+│   ├── preview.js              stills, and the film in the large preview
 │   ├── hero.js                 the three-phone hero showcase + rotation
 │   ├── sale.js                 the season-sale opening announcement
 │   └── app.js                  grouping, sorting, WhatsApp links, modal
@@ -34,7 +34,9 @@ Cloudflare Pages or any other static host.
 │   └── site-config.js          YOUR WHATSAPP NUMBER lives here
 │
 ├── assets/
-│   ├── hero/                   optional hero.mp4 background film
+│   ├── hero/                   optional hero.mp4 + hero-poster.jpg
+│   │   ├── rail/               the posters drifting behind the masthead
+│   │   └── posters/            the three phones in the masthead
 │   ├── logo/                   logo.svg, favicon.svg
 │   └── icons/                  whatsapp, music, rsvp, close (SVG)
 │
@@ -46,9 +48,9 @@ Cloudflare Pages or any other static host.
 │   └── README.md               working folder for raw video exports
 │
 ├── templates/                  grouped by collection
-│   ├── hindu/template-01/preview/      preview.mp4
-│   ├── christian/template-02/preview/  preview.mp4
-│   └── islamic/template-03/preview/    preview.mp4
+│   ├── hindu/HN01/preview/      preview.mp4
+│   ├── christian/CH01/preview/  preview.mp4
+│   └── islamic/IS01/preview/    preview.mp4
 │
 ├── README.md
 └── .gitignore
@@ -63,28 +65,44 @@ project of your own.
 ## 2. WHERE TO PUT YOUR PREVIEW VIDEOS
 
 ```
-templates/hindu/template-01/preview/preview.mp4
-templates/christian/template-02/preview/preview.mp4
-templates/islamic/template-03/preview/preview.mp4
+templates/hindu/HN01/preview/preview.mp4
+templates/christian/CH01/preview/preview.mp4
+templates/islamic/IS01/preview/preview.mp4
 ```
 
 The shape is always `templates/<collection>/<folder>/preview/preview.mp4`,
 and the registry builds that path for you — see section 3.
 
-**The video is the preview.** This project is video-only: there are no poster
-images, and none are required.
+**Every template needs two files: a still and a film.** Put them side by
+side in the same folder:
 
-Nothing breaks while a video is missing:
+```
+templates/hindu/HN01/preview/preview.mp4     the film
+templates/hindu/HN01/preview/poster.jpg      the still
+```
 
-1. If `preview.mp4` exists → it plays, muted and looping, in the hero and in
-   its collection.
-2. If it is missing → an elegant "Preview coming soon" plate is shown inside
-   the phone.
+The registry builds both paths for you. `poster.jpg` is what is looked for
+first, and `.webp` and `.png` are tried too — whichever you export works.
 
-A still frame is still *supported* if you ever want one: export a 1080x1920
-JPG, put it beside the video, and add a `posterPath` line to that template.
-It then covers the moment before the first video frame decodes, and stands in
-if the video ever fails. Entirely optional.
+**Nothing plays by itself.** This is deliberate, and it is what keeps the
+site quick:
+
+1. A card in a collection shows its **still**. It never downloads the film,
+   however long it is looked at.
+2. The three phones in the masthead show **stills** too.
+3. The film is downloaded and played in **one place only** — the large
+   preview, which opens when a visitor taps the phone or the **Play preview**
+   button under the card. Closing it releases the film again.
+4. It runs **once**, then stops on its last frame and offers a **Play again**
+   button. It does not loop, and it does not start over by itself when the
+   visitor comes back to the tab.
+
+So a page of fifty templates costs fifty small images to browse, not fifty
+videos. With four templates the difference is about **14 MB**.
+
+If a still is missing, an elegant "Preview coming soon" plate is shown in the
+phone instead, and the play mark is hidden — so a template with no artwork
+yet never looks broken, and never invites a tap that leads nowhere.
 
 ---
 
@@ -93,13 +111,13 @@ if the video ever fails. Entirely optional.
 **Step 1 — create the folder**
 
 ```
-templates/hindu/template-04/preview/
+templates/hindu/HN03/preview/
 ```
 
 **Step 2 — put the video inside it**
 
 ```
-templates/hindu/template-04/preview/preview.mp4
+templates/hindu/HN03/preview/preview.mp4
 ```
 
 ### The quick way: paste the folder, run one file
@@ -121,7 +139,7 @@ Then open `js/templates.js` and edit the new entry's `name` and
 
 So the whole flow is:
 
-1. Paste `templates/hindu/template-05/preview/preview.mp4`
+1. Paste `templates/hindu/HN02/preview/preview.mp4`
 2. Double-click `tools/sync-templates.bat`
 3. Edit the name and description
 4. Refresh
@@ -131,19 +149,20 @@ The manual steps below do the same thing by hand.
 **Step 3 — open `js/templates.js`**
 
 **Step 4 — add one object to the list.** Put a comma after the previous
-object, then paste this and change the values:
+object, then paste this and change the values. You do not name it: it is
+called `HN3` because it is the third Hindu template, and that is what the
+card and the WhatsApp message will say.
 
 ```js
 {
   id: "hindu-02",
-  name: "Template 04",
   religion: "hindu",
   description: "A modern Hindu wedding invitation with a quiet, editorial feel.",
   price: 999,
   originalPrice: 1499,
   music: true,
   rsvp: true,
-  previewPath: "templates/template-04/preview/preview.mp4",
+  previewPath: "templates/hindu/HN03/preview/preview.mp4",
   createdAt: "2026-09-10"
 }
 ```
@@ -153,9 +172,9 @@ object, then paste this and change the values:
 | Field           | What it does                                                        |
 | --------------- | ------------------------------------------------------------------- |
 | `id`            | Unique text id. Never repeat one.                                    |
-| `name`          | Shown under the phone and used in the WhatsApp message.              |
+| `name`          | Worked out for you — the code, e.g. `HN01`. Leave it out.             |
 | `collection`    | `"hindu"`, `"christian"`, `"islamic"` — or any new one you invent.   |
-| `folder`        | The folder name inside that collection, e.g. `"template-04"`.        |
+| `folder`        | The folder name inside that collection, e.g. `"HN03"`.        |
 | `description`   | One or two short lines shown under the name.                         |
 | `price`         | The selling price. Number only, no `₹`.                              |
 | `originalPrice` | The struck-through price. Number only.                               |
@@ -163,7 +182,7 @@ object, then paste this and change the values:
 | `rsvp`          | `true` shows "RSVP".                                                 |
 | `multilingual`  | `true` shows the highlighted "Multilingual" badge.                    |
 | `previewPath`   | Optional. Built from `collection` + `folder` unless you set it.      |
-| `posterPath`    | Optional. A still frame for loading/fallback. Omit for video-only.   |
+| `posterPath`    | Optional. Only if the still sits somewhere off-convention.           |
 | `createdAt`     | `"YYYY-MM-DD"`. The newest date appears first.                       |
 
 ### The hero showcase
@@ -179,7 +198,7 @@ one is warmed in the background, so a large catalogue stays light.
 
 House warming, baby shower, birthday — the site is not limited to weddings.
 
-1. Create `templates/housewarming/template-01/preview/preview.mp4`
+1. Create `templates/housewarming/HW01/preview/preview.mp4`
 2. Add an entry with `collection: "housewarming"`
 3. Optionally add a nicer heading and choose its position in
    `config/site-config.js`:
@@ -225,19 +244,42 @@ whatsappNumber: "919876543210",
 
 Every WhatsApp button on the site updates immediately. The message sent is:
 
-> Hello RagaHru, I would like to enquire about Template 01 for our wedding.
+> Hello RagaHru, I would like to enquire about HN01 for our wedding.
 > Could you please share the details and the next steps? Thank you.
 
-The template name changes for each card automatically, so every enquiry that
-reaches you reads as a proper note from a client and already says which
-template they want — Template 04's card names Template 04. You can reword the
-message in the same file via `enquiryMessage` — keep `{template}` in it, that
-is the placeholder the template name is dropped into.
+The code changes for each card automatically, so every enquiry that reaches
+you reads as a proper note from a client and already names exactly one
+template — the second Christian card sends `CH02`, and nothing else does. You
+can reword the message in the same file via `enquiryMessage` — keep
+`{template}` in it, that is the placeholder the code is dropped into.
 
 Until you replace the placeholder number the buttons still work; WhatsApp
 simply asks the visitor to pick a contact.
 
+### The poster rail behind the masthead
+
+A single unbroken row of posters drifting slowly across the top of the page,
+the way a cinema runs its front-of-house. It loops forever and never seams.
+
+```
+assets/hero/rail/poster-01.jpg ... poster-10.jpg
+```
+
+Named in `heroRail` in `config/site-config.js`. To change one, replace the
+file with your own of the same name; to add or remove one, add or remove a
+line in that list. The row measures itself, so the drift stays at the same
+speed and the loop stays seamless however many there are. See
+`assets/hero/rail/README.md`.
+
+They sit **under** the espresso ground, so only about a seventh of each comes
+through — atmosphere behind the headline, never the subject. Ten posters cost
+about **240 KB** against the **3.6 MB** of the background film they replaced.
+
+Empty the list and the masthead falls back to the still or the film below.
+
 ### The hero background film
+
+*Only reached when `heroRail` above is empty.*
 
 Optional. Drop a file at `assets/hero/hero.mp4` and the hero gains a slow
 background film; leave the folder empty and the hero looks exactly as it does
@@ -245,9 +287,83 @@ now. See `assets/hero/README.md` for what to export.
 
 It sits **behind** the espresso ground under a warm scrim, so the dual tone and
 the headline contrast never depend on what the video happens to show. Muted,
-looping, inline, paused when the hero scrolls away, and not loaded at all for
-visitors who ask for reduced motion. Change the path with `heroVideo` in
-`config/site-config.js`.
+looping, inline, and paused when the hero scrolls away. Change the path with
+`heroVideo` in `config/site-config.js`.
+
+**Give it a still as well.** `heroPoster` in the same file names an image
+that is shown from the first moment the page opens — about 90 KB against the
+film's several megabytes — so the masthead is never a dark rectangle while
+the film downloads. The first decoded frame then replaces it with nothing to
+see, provided the still is a frame of that same film at the same size. It is
+also what a visitor who has asked their system for less movement is shown
+instead of the loop.
+
+**A recording made on a phone carries that phone's status bar** along its top
+edge. On a wide screen it is cropped away by hundreds of pixels and never
+shows; on a narrow one the crop is only about twenty pixels and the clock is
+left above the headline. `css/style.css` pulls the frame down and grows it a
+few per cent below 480px to put that strip outside the hero. If you re-record
+without a status bar, that rule simply stops mattering.
+
+### What each template is called
+
+Nothing is named by hand. **The folder is the name.**
+
+```
+templates/hindu/HN01/       →  HN01
+templates/hindu/HN02/       →  HN02
+templates/christian/CH01/   →  CH01
+templates/islamic/IS01/     →  IS01
+```
+
+Two letters for the collection, then two digits:
+
+```
+HN01  HN02  HN03 ...    Hindu
+CH01  CH02  CH03 ...    Christian
+IS01  IS02  IS03 ...    Islamic
+```
+
+That code is what appears under the phone, in the large preview, and in the
+WhatsApp message — so an enquiry names exactly one template, and the folder
+it lives in is obvious from the enquiry itself. A client writes "CH02" and
+you open `templates/christian/CH02/`.
+
+**Name the folder and you have named the template.** Nothing renumbers when
+you add or remove one, because nothing is being counted — a code that has
+already gone out to a client stays put.
+
+If a folder is *not* named that way, a code is worked out instead from the
+collection's `code` in `config/site-config.js` and the template's age within
+that collection, so an older folder still gets a sensible `HN01`. To force
+one either way, give the entry its own `code: "HN07"`.
+
+### The three phones in the masthead
+
+They show three images of your own, named in `heroPhonePosters` in
+`config/site-config.js` and kept in their own folder:
+
+```
+assets/hero/posters/phone-01.jpg     the LEFT phone
+assets/hero/posters/phone-02.jpg     the CENTRE phone
+assets/hero/posters/phone-03.jpg     the RIGHT phone
+```
+
+To change what the masthead shows, replace a file with your own of the same
+name. Nothing else needs editing. See `assets/hero/posters/README.md`.
+
+**These are separate from the catalogue on purpose.** The template posters
+live beside their videos, and the two never affect each other: changing a
+hero image leaves the collections alone, and adding a template leaves the
+masthead alone. The first thing a visitor sees is chosen, not inherited from
+whichever templates happen to be newest.
+
+Empty that list and the masthead goes back to cycling the templates from
+`js/templates.js`, using each one's own poster — which is how it behaved
+before the folder existed.
+
+The phones keep drifting between the three positions either way, so an image
+travels with its phone rather than sitting still.
 
 ### The design system
 
@@ -350,7 +466,10 @@ npx serve .
 
 While testing, check:
 
-- each phone plays its video, or falls back to the poster
+- each phone shows its poster, or the "Preview coming soon" plate
+- no video is requested until a preview is opened (Network tab, filter: mp4)
+- opening a preview plays the film, and closing it stops the download
+- the film stops at its end and offers Play again, rather than looping
 - the three sections appear in order and newest cards come first
 - clicking a phone opens the large preview modal, and `Esc` closes it
 - the WhatsApp buttons open a chat with the right template name
@@ -398,7 +517,8 @@ simply not present in this project. Keep it that way.
 
 ## 9. BROWSER SUPPORT
 
-Modern Chrome, Edge, Safari and Firefox — desktop and mobile. Videos play
-muted, looping and inline, which is what allows autoplay on iOS and Android.
-Older browsers without `IntersectionObserver` still see the previews; they just
-load them all at once.
+Modern Chrome, Edge, Safari and Firefox — desktop and mobile. The film in
+the large preview plays muted and inline, which is what lets it start on iOS
+and Android without a second tap. It runs once and then waits. Older browsers without
+`IntersectionObserver` still see every poster; they just load them all at
+once instead of as they are reached.

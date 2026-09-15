@@ -544,6 +544,115 @@ html.has-mark .brand__logo { display: block; }
 /* only ever seen once a real file has loaded */
 html.has-hero-video .hero__bg { opacity: 1; }
 
+/* =========================================================================
+   THE POSTER RAIL
+   A single unbroken row of posters drifting across the masthead, the way a
+   cinema front-of-house runs. It sits on the same layer the film sat on, so
+   the espresso ground, the warm bloom and the horizon all still fall over
+   it exactly as before.
+
+   How the loop is seamless: the list is laid down TWICE and the track slides
+   left by exactly the width of one pass. At the end of that slide the second
+   copy is sitting precisely where the first began, so the jump back to zero
+   cannot be seen. The spacing is a margin on each poster rather than a flex
+   `gap`, because a gap leaves one fewer space than there are posters and the
+   two halves would no longer measure the same.
+
+   The distance and the duration are both written in by js/app.js from the
+   real measured width, so the drift runs at the same speed on a phone as on
+   a wide desktop.
+   ========================================================================= */
+
+.hero__rail {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.4s var(--ease);
+}
+html.has-hero-rail .hero__rail { opacity: 1; }
+
+.hero__rail-track {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  width: max-content;
+  /* held still until the measurement lands, so the first frame is never a
+     row that jumps as its duration is corrected */
+  animation: rail-drift var(--rail-seconds, 120s) linear infinite;
+  animation-play-state: paused;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+}
+html.has-hero-rail .hero__rail-track { animation-play-state: running; }
+
+.hero__rail-poster {
+  flex: none;
+  height: clamp(260px, 44vh, 440px);
+  width: auto;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  margin-right: clamp(12px, 1.5vw, 24px);
+  border-radius: 3px;
+  /* the posters are atmosphere behind the headline, never the subject */
+  filter: saturate(0.88);
+}
+
+@keyframes rail-drift {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(calc(-1 * var(--rail-shift, 50%)), 0, 0); }
+}
+
+/* Two rows read as depth rather than as a strip. The second is smaller,
+   dimmer and drifts the other way, so the masthead has parallax without
+   anything asking to be looked at. */
+.hero__rail--back {
+  opacity: 0;
+}
+html.has-hero-rail .hero__rail--back { opacity: 0.38; }
+
+.hero__rail--back .hero__rail-track {
+  animation-name: rail-drift-back;
+  align-items: flex-start;
+}
+.hero__rail--back .hero__rail-poster {
+  height: clamp(150px, 26vh, 260px);
+  margin-right: clamp(10px, 1.2vw, 18px);
+  filter: saturate(0.72) blur(1px);
+}
+
+@keyframes rail-drift-back {
+  from { transform: translate3d(calc(-1 * var(--rail-shift, 50%)), 0, 0); }
+  to   { transform: translate3d(0, 0, 0); }
+}
+
+/* The masthead film is a phone recording, so it carries that phone's own
+   status bar - a clock, a battery, a recording dot - along its top edge.
+
+   On a wide screen this never shows: a tall portrait frame covering a short
+   landscape box is cropped by hundreds of pixels top and bottom. On a narrow
+   one the two shapes are close, the crop falls to about twenty pixels, and
+   the clock is left sitting above the headline.
+
+   So on narrow screens the frame is anchored to its bottom edge and grown a
+   few per cent. Both moves push that strip above the top of the hero, which
+   clips it. The poster is the film's own frame at the same size, so this
+   lands on both identically and the first decoded frame arrives with nothing
+   to see. */
+@media (max-width: 480px) {
+  .hero__bg {
+    object-position: 50% 100%;
+    /* 1.081 is where the strip just clears the edge on the narrowest phone,
+       where cover() crops nothing at all vertically. 1.14 keeps a margin for
+       a hero that grows a little with its own copy. Above this width cover()
+       already crops several hundred pixels and neither move is needed. */
+    transform: scale(1.14);
+    transform-origin: 50% 100%;
+  }
+}
+
 .hero__tint {
   position: absolute;
   inset: 0;
@@ -555,13 +664,24 @@ html.has-hero-video .hero__bg { opacity: 1; }
     radial-gradient(76% 64% at 16% 86%, rgba(41, 36, 31, 0.85), rgba(41, 36, 31, 0) 70%);
 }
 
-/* With a film behind it the ground becomes a scrim: enough espresso to hold
-   the dual tone and the headline contrast, little enough to let the movement
-   read as depth. */
+/* With something moving behind it the ground becomes a scrim: enough espresso
+   to hold the dual tone and the headline contrast, little enough to let the
+   movement read as depth.
+
+   The rail is held back harder than the film was. Ten lit invitations passing
+   behind the headline is a great deal of bright, busy paper, and the headline
+   has to win every time - so only about a seventh of the posters comes
+   through. They are meant to be sensed rather than read. */
 html.has-hero-video .hero__tint {
   background-color: rgba(33, 28, 24, 0.78);
   backdrop-filter: saturate(0.85);
   -webkit-backdrop-filter: saturate(0.85);
+}
+
+html.has-hero-rail .hero__tint {
+  background-color: rgba(30, 25, 21, 0.86);
+  backdrop-filter: saturate(0.72) blur(1.5px);
+  -webkit-backdrop-filter: saturate(0.72) blur(1.5px);
 }
 
 .hero::before {
@@ -736,17 +856,6 @@ html.has-hero-video .hero__tint {
   background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.58), rgba(0, 0, 0, 0) 70%);
 }
 .hero__stage .hero__phone .watermark { font-size: 6px; letter-spacing: 0.36em; }
-
-/* the element that warms the next video: present, never seen */
-.hero__warmer {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 1px;
-  height: 1px;
-  opacity: 0;
-  pointer-events: none;
-}
 
 /* the composition arrives from a little depth, just after the copy */
 html.is-booting .hero__stage {
@@ -969,6 +1078,109 @@ html.is-ready .hero__stage {
   background: var(--line);
   margin-right: 13px;
   flex: none;
+}
+
+/* ---- the play mark on a card's phone ----
+   A card shows a still, which on its own gives a visitor no reason to think
+   there is anything to watch. This is the one thing that says so. It is
+   decorative - the phone behind it is already the button - and it lifts
+   towards the visitor as the card is hovered. */
+
+.phone__play {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  width: clamp(38px, 17%, 52px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1px solid rgba(244, 238, 228, 0.42);
+  background: rgba(28, 23, 19, 0.42);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  color: rgba(246, 241, 232, 0.94);
+  pointer-events: none;
+  transition: transform 0.5s var(--ease), background 0.5s var(--ease),
+              border-color 0.5s var(--ease);
+}
+
+.phone__play svg {
+  width: 38%;
+  height: 38%;
+  /* the optical centre of a triangle sits left of its box */
+  margin-left: 7%;
+}
+
+.card__trigger:hover .phone__play,
+.card__trigger:focus-visible .phone__play {
+  transform: translate(-50%, -50%) scale(1.08);
+  background: rgba(28, 23, 19, 0.56);
+  border-color: rgba(244, 238, 228, 0.6);
+}
+
+/* Nothing to play: the plate says so instead. A sibling combinator rather
+   than :has(), because the play mark already follows the plate in the markup
+   and this works in every browser that renders the rest of the page. */
+.phone__coming:not([hidden]) ~ .phone__play { display: none; }
+
+/* ---- Play again ----
+   The large preview runs once and stops on its last frame. This offers it
+   back rather than starting over on its own, and it is a real button: the
+   one control inside a phone screen anywhere on the site. */
+
+.phone__replay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 0;
+  border: 0;
+  cursor: pointer;
+  /* a scrim, so the label is legible whatever the film ended on */
+  background: radial-gradient(70% 50% at 50% 50%, rgba(18, 14, 12, 0.72), rgba(18, 14, 12, 0.5));
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+  color: rgba(246, 241, 232, 0.94);
+  animation: replay-in 0.5s var(--ease-soft) backwards;
+}
+
+@keyframes replay-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.phone__replay-mark {
+  display: grid;
+  place-items: center;
+  width: clamp(44px, 22%, 62px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px solid rgba(244, 238, 228, 0.46);
+  background: rgba(28, 23, 19, 0.44);
+  transition: transform 0.45s var(--ease), border-color 0.45s var(--ease);
+}
+
+.phone__replay-mark svg { width: 46%; height: 46%; }
+
+.phone__replay-text {
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(246, 241, 232, 0.82);
+}
+
+.phone__replay:hover .phone__replay-mark,
+.phone__replay:focus-visible .phone__replay-mark {
+  transform: scale(1.08);
+  border-color: rgba(244, 238, 228, 0.7);
 }
 
 /* ---- price ---- */
@@ -1583,13 +1795,24 @@ html.has-mark .site-footer__logo { display: block; }
   color: rgba(245, 239, 229, 0.66);
 }
 
+/* The promise and the line beside it are one statement, so they are set as
+   one: the same face, the same case, the same tracking, with the promise
+   carried by colour and weight rather than by a second typeface.
+
+   It was previously set in the display serif at mixed case, which put two
+   voices side by side - and Cormorant draws its figures OLDSTYLE by default,
+   so the "24" dropped below the baseline and read as lowercase next to the
+   capitals. Lining, tabular figures put it back on the cap line. */
 .hero__note-key {
-  font-family: var(--serif);
-  font-size: 17px;
+  font-family: inherit;
+  font-size: 1em;
   font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: none;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  font-variant-numeric: lining-nums tabular-nums;
+  font-feature-settings: "lnum" 1, "tnum" 1;
   color: var(--champagne);
+  white-space: nowrap;
 }
 
 .hero__note-sep {
@@ -2051,15 +2274,18 @@ html.is-ready .signature--hero {
   transition: color 0.4s var(--ease);
 }
 
-.link-cta__arrow {
-  display: inline-block;
+/* The mark leads the label rather than trailing it: the button now names an
+   action, and the eye should meet the action first. */
+.link-cta .ico {
+  font-size: 1.05em;
+  color: var(--accent);
   transition: transform 0.45s var(--ease-hero);
 }
 
 .link-cta:hover,
 .link-cta:focus-visible { color: var(--ink); }
-.link-cta:hover .link-cta__arrow,
-.link-cta:focus-visible .link-cta__arrow { transform: translateX(5px); }
+.link-cta:hover .ico,
+.link-cta:focus-visible .ico { transform: scale(1.14); }
 
 /* the primary CTA firms up while the card is hovered */
 .card:hover .card__cta { border-color: rgba(33, 27, 24, 0.34); }
@@ -2148,7 +2374,10 @@ html.is-ready .signature--hero {
   .hero__stage .hero__phone[data-pos="right"] .phone__body { animation: none; transform: rotate(1.4deg); }
   .hero__stage .hero__phone[data-pos="center"] .phone__body { animation: none; }
 
+  .phone__replay { animation: none; }
+  .hero__rail-track { animation: none; transform: none; }
+
   .btn:hover,
   .btn:focus-visible { transform: none; box-shadow: none; }
-  .link-cta:hover .link-cta__arrow { transform: none; }
+  .link-cta:hover .ico { transform: none; }
 }

@@ -157,6 +157,7 @@
     music: '<svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M9 6.2 20.4 4v2.1L9 8.3z"/><rect x="7.9" y="6.2" width="1.5" height="10.9" rx=".5"/><rect x="18.9" y="4" width="1.5" height="10.2" rx=".5"/><circle cx="6" cy="17.2" r="2.6"/><circle cx="17" cy="14.3" r="2.6"/></svg>',
     rsvp: '<svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M3 4.5h18c.55 0 1 .45 1 1v.6l-9.5 5.5a1 1 0 0 1-1 0L2 6.1v-.6c0-.55.45-1 1-1z"/><path d="M2 8.4v10.1c0 .55.45 1 1 1h18c.55 0 1-.45 1-1V8.4l-9 5.2a1 1 0 0 1-1 0z"/></svg>',
     lang: '<svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M12.87 15.07l-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35c-.93-1.03-1.7-2.16-2.31-3.35h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/></svg>',
+    play: '<svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M8.4 5.6a.9.9 0 0 1 1.37-.77l8.1 5.1a.9.9 0 0 1 0 1.53l-8.1 5.1A.9.9 0 0 1 8.4 15.8z"/></svg>',
     wa: '<svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.64.08-.3-.15-1.26-.47-2.39-1.48-.88-.79-1.48-1.76-1.65-2.06-.18-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.91-2.2-.25-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.87 1.22 3.07c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.7.25-1.29.17-1.42-.07-.12-.27-.2-.57-.34M12.05 21.79h-.01c-1.77 0-3.5-.48-5.03-1.38l-.36-.22-3.74.99 1-3.65-.24-.38a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.88 9.89-9.88 2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 0 1 2.89 6.99c0 5.45-4.43 9.89-9.88 9.89m8.41-18.3A11.82 11.82 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.15 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.69 1.45c6.55 0 11.89-5.34 11.89-11.89 0-3.18-1.24-6.17-3.48-8.42"/></svg>'
   };
 
@@ -222,12 +223,23 @@
           '<div class="phone__screen"' +
                ' data-video="' + esc(entry.previewPath || '') + '"' +
                ' data-poster="' + esc(entry.posterPath || '') + '">' +
-            '<img class="phone__poster" alt="' + esc(alt) + '" draggable="false" decoding="async">' +
-            '<video class="phone__video" muted loop playsinline autoplay preload="none"' +
-                   ' disablepictureinpicture' +
-                   ' controlslist="nodownload noplaybackrate noremoteplayback"></video>' +
+            /* No <video> here. A card never plays one, and an element left
+               carrying `autoplay` is exactly the kind of thing that starts
+               playing again the day someone gives it a src. */
+            /* No loading="lazy" here. The preview engine already holds the
+               src back until the card is near the viewport - that IS the
+               lazy part - so the native attribute only defers it a second
+               time, after the decision to show it has been made. */
+            '<img class="phone__poster" alt="' + esc(alt) + '" draggable="false"' +
+                 ' decoding="async">' +
             '<p class="phone__coming" hidden>Preview<br>coming soon</p>' +
             '<span class="phone__sheen" aria-hidden="true"></span>' +
+            /* The card shows a still, so it has to SAY there is a film to
+               watch. The mark is decorative: the whole phone is already the
+               button that opens the preview. */
+            '<span class="phone__play" aria-hidden="true">' +
+              '<svg viewBox="0 0 24 24" fill="currentColor" focusable="false"><path d="M9 6.3a.8.8 0 0 1 1.22-.68l7.2 4.53a.8.8 0 0 1 0 1.36l-7.2 4.53A.8.8 0 0 1 9 15.35z"/></svg>' +
+            '</span>' +
             '<span class="watermark" aria-hidden="true">' + esc(BRAND) + '</span>' +
           '</div>' +
         '</div>' +
@@ -242,7 +254,7 @@
     return '' +
       '<article class="card reveal" style="--reveal-delay:' + delay + 'ms">' +
         '<button class="card__trigger" type="button" data-template="' + key + '"' +
-                ' aria-label="Open a larger preview of ' + esc(entry.name) + '">' +
+                ' aria-label="Play the preview of ' + esc(entry.name) + '">' +
           phoneMarkup(entry, collectionLabel, index) +
         '</button>' +
         '<h3 class="card__name">' + esc(entry.name) +
@@ -262,9 +274,9 @@
             '<span>Enquire</span>' +
           '</a>' +
           '<button class="link-cta" type="button" data-template="' + key + '"' +
-                  ' aria-label="View ' + esc(entry.name) + ' in a larger preview">' +
-            '<span>View wedding</span>' +
-            '<span class="link-cta__arrow" aria-hidden="true">&#8594;</span>' +
+                  ' aria-label="Play the preview of ' + esc(entry.name) + '">' +
+            ICONS.play +
+            '<span>Play preview</span>' +
           '</button>' +
         '</div>' +
       '</article>';
@@ -566,6 +578,26 @@
     modal.root.classList.add('is-open');
     if (modal.large) { modal.large.style.transform = ''; }
 
+    /* The same safety net the previews carry. Clearing the transform hands
+       the move to a transition, and a transition whose first frame is dropped
+       - a throttled tab, a stalled compositor - is left PINNED at its start
+       value, which here means the phone stranded small and far down the
+       panel. Re-targeting it does nothing while the transition holds it, so
+       the transition is what has to go. */
+    window.setTimeout(function () {
+      if (!modal.isOpen || !modal.large) { return; }
+
+      var seated = window.getComputedStyle(modal.large).transform;
+      if (seated === 'none' || seated === 'matrix(1, 0, 0, 1, 0, 0)') { return; }
+
+      modal.large.style.transition = 'none';
+      modal.large.style.transform = 'none';
+      /* committed - now hand the transition back, so closing still glides
+         the phone home rather than snapping it */
+      void modal.large.offsetWidth;
+      modal.large.style.transition = '';
+    }, 900);
+
     Preview.open(modal.screen, {
       src: entry.previewPath || '',
       poster: entry.posterPath || ''
@@ -757,18 +789,229 @@
     }
   }
 
+  /* -------------------------------------------------------------------
+     The poster rail.
+
+     The list is laid down twice so the loop has somewhere to land, and the
+     track slides by exactly one pass. Both the distance and the duration are
+     measured here rather than guessed in CSS: a fixed duration would run the
+     posters past at one speed on a phone and a quite different one on a wide
+     desktop, because the track is far longer there.
+     ------------------------------------------------------------------- */
+
+  var HERO_RAIL_SPEED = 24;        /* px per second - a slow, cinematic drift */
+
+  function buildHeroRail(video, sources) {
+    var hero = video.closest ? video.closest('.hero') : document.querySelector('.hero');
+    if (!hero) { return; }
+
+    var front = railLayer('hero__rail');
+    var back = railLayer('hero__rail hero__rail--back');
+
+    /* the back row starts part-way along, so the two are never in step */
+    back.firstChild.style.animationDelay = '-18s';
+
+    video.parentNode.insertBefore(back, video);
+    video.parentNode.insertBefore(front, video);
+    video.parentNode.removeChild(video);
+
+    var loaded = 0;
+    var wanted = front.querySelectorAll('img').length;
+
+    function ready() {
+      loaded += 1;
+      /* measured once most of the row is in, so the widths are real */
+      if (loaded >= Math.min(wanted, sources.length)) { measure(); }
+    }
+
+    [front, back].forEach(function (layer) {
+      var imgs = layer.querySelectorAll('img');
+      for (var i = 0; i < imgs.length; i += 1) {
+        imgs[i].addEventListener('load', ready);
+        imgs[i].addEventListener('error', ready);
+      }
+    });
+
+    /* One pass has to be at least as wide as the screen, or the moment it
+       has slid away there is nothing behind it yet and a bare strip opens at
+       the edge. Ten posters cover a laptop comfortably; a very wide screen,
+       or a short one where the posters are small, needs the list laid down
+       more than once per pass. That is worked out from the measured width
+       rather than assumed. */
+    function measure() {
+      var width = window.innerWidth || document.documentElement.clientWidth;
+      var refilled = false;
+
+      [front, back].forEach(function (layer) {
+        var track = layer.firstChild;
+        var copies = Number(track.getAttribute('data-copies')) || 2;
+        var setWidth = track.scrollWidth / copies;
+        if (!setWidth) { return; }
+
+        var wanted = Math.max(2, 2 * Math.ceil(width / setWidth));
+        if (wanted !== copies) {
+          fill(track, wanted);
+          refilled = true;
+        }
+      });
+
+      /* the refilled tracks are measured on the next pass, not this one */
+      if (refilled) {
+        window.setTimeout(measure, 60);
+        return;
+      }
+
+      [front, back].forEach(function (layer) {
+        var track = layer.firstChild;
+        /* one pass is half the track: the list is always laid an even
+           number of times, so the two halves are identical */
+        var pass = track.scrollWidth / 2;
+        if (!pass) { return; }
+
+        track.style.setProperty('--rail-shift', pass + 'px');
+        track.style.setProperty('--rail-seconds', (pass / HERO_RAIL_SPEED).toFixed(2) + 's');
+      });
+
+      document.documentElement.classList.add('has-hero-rail');
+    }
+
+    /* a stalled `load` must never leave the masthead empty */
+    window.setTimeout(function () {
+      if (!document.documentElement.classList.contains('has-hero-rail')) { measure(); }
+    }, 2200);
+
+    /* Nothing should be drifting while the masthead is off screen. The track
+       is a large promoted layer - a few thousand pixels of poster - and there
+       is no reason to keep a compositor and a battery busy moving it where
+       nobody is looking. */
+    if (typeof window.IntersectionObserver === 'function') {
+      new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          [front, back].forEach(function (layer) {
+            var track = layer.firstChild;
+            if (!track) { return; }
+            /* '' hands it back to the stylesheet, which runs it */
+            track.style.animationPlayState = entry.isIntersecting ? '' : 'paused';
+          });
+        });
+      }, { threshold: 0 }).observe(hero);
+    }
+
+    /* the track is sized from the viewport, so a resize re-measures it */
+    var settle = null;
+    window.addEventListener('resize', function () {
+      window.clearTimeout(settle);
+      settle = window.setTimeout(measure, 220);
+    }, { passive: true });
+
+    /* Lays the list down `copies` times. Always an even number, so the track
+       divides into two identical halves and the loop cannot seam. */
+    function fill(track, copies) {
+      while (track.firstChild) { track.removeChild(track.firstChild); }
+
+      for (var pass = 0; pass < copies; pass += 1) {
+        for (var i = 0; i < sources.length; i += 1) {
+          var img = document.createElement('img');
+          img.className = 'hero__rail-poster';
+          img.src = sources[i];
+          img.alt = '';
+          img.decoding = 'async';
+          img.draggable = false;
+          /* Every copy after the first points at a URL the browser has
+             already fetched, so they cost nothing to leave eager - and a
+             lazy image inside a track being moved by a CSS animation can be
+             slow to notice it has come into view, which would show as a gap
+             sliding through the row. */
+          track.appendChild(img);
+        }
+      }
+
+      track.setAttribute('data-copies', String(copies));
+    }
+
+    function railLayer(className) {
+      var layer = document.createElement('div');
+      layer.className = className;
+      layer.setAttribute('aria-hidden', 'true');
+
+      var track = document.createElement('div');
+      track.className = 'hero__rail-track';
+      fill(track, 2);
+
+      layer.appendChild(track);
+      return layer;
+    }
+  }
+
+  /* Replaces the background film element with a plain image. The hero keeps
+     exactly the same layers - the image sits where the film would have, under
+     the same tint and bloom - so nothing else about the masthead changes. */
+  function showHeroStill(video, src) {
+    var img = document.createElement('img');
+    img.className = video.className;
+    img.id = video.id;
+    img.alt = '';
+    img.setAttribute('aria-hidden', 'true');
+    img.setAttribute('decoding', 'async');
+    img.draggable = false;
+
+    img.addEventListener('load', function () {
+      document.documentElement.classList.add('has-hero-video');
+    });
+
+    /* a missing still simply leaves the masthead as it is */
+    img.addEventListener('error', function () {
+      document.documentElement.classList.remove('has-hero-video');
+      if (img.parentNode) { img.parentNode.removeChild(img); }
+    });
+
+    if (video.parentNode) { video.parentNode.replaceChild(img, video); }
+    img.src = src;
+  }
+
   /* The hero film. It is only revealed once a real file has decoded a frame,
      so a missing or broken video leaves the hero exactly as it is rather than
      flashing an empty black box. It pauses off screen, and never loads at all
      for visitors who ask for reduced motion. */
   function wireHeroVideo() {
     var video = document.getElementById('hero-bg');
-    var src = CONFIG.heroVideo;
-    if (!video || !src) { return; }
+    if (!video) { return; }
 
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      video.remove();
+    /* A rail of posters, if one has been given, takes the masthead. It is
+       lighter than a film by an order of magnitude and it never stops. */
+    var rail = Array.isArray(CONFIG.heroRail) ? CONFIG.heroRail.filter(function (src) {
+      return typeof src === 'string' && src.length > 0;
+    }) : [];
+
+    if (rail.length) {
+      buildHeroRail(video, rail);
       return;
+    }
+
+    var src = CONFIG.heroVideo;
+    var poster = CONFIG.heroPoster;
+
+    /* Someone who has asked their system for less movement gets the still
+       rather than a loop - and rather than nothing at all. */
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      if (poster) { showHeroStill(video, poster); }
+      else { video.remove(); }
+      return;
+    }
+
+    /* No film named: the still stands on its own if there is one. */
+    if (!src) {
+      if (poster) { showHeroStill(video, poster); }
+      return;
+    }
+
+    /* The still is the film's own poster frame. It costs about 90 KB and
+       paints almost at once, so the masthead is warm from the first moment
+       while the several megabytes of film are still arriving behind it. The
+       first decoded frame then takes its place with nothing to see. */
+    if (poster) {
+      video.setAttribute('poster', poster);
+      document.documentElement.classList.add('has-hero-video');
     }
 
     video.muted = true;

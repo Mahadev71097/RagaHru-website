@@ -30,9 +30,73 @@ const SITE_CONFIG = {
      enquiry says which design it is about in its own first line. */
   enquiryMessage: "Hello RagaHru, I would like to enquire about {template} for our wedding. Could you please share the details and the next steps? Thank you.",
 
-  /* Optional hero background video. Drop the file in and it is used; leave
-     the folder empty and the hero stays as it is. */
+  /* THE POSTER RAIL BEHIND THE MASTHEAD
+     -----------------------------------------------------------------------
+     A single unbroken row of posters drifting slowly across the top of the
+     page, the way a cinema runs its front-of-house. It loops forever and
+     never seams.
+
+         assets/hero/rail/poster-01.jpg ... poster-10.jpg
+
+     To change one, replace the file with your own of the same name. To add
+     or remove one, add or remove a line here - the row measures itself and
+     keeps the same drift speed either way.
+
+     Portrait, 2:3 (about 400 x 600). They sit under the espresso ground and
+     the warm bloom, so they read as atmosphere, never as the subject.
+
+     Empty this list and the masthead falls back to heroPoster / heroVideo
+     below, which is how it behaved before the rail existed. */
+  heroRail: [
+    "assets/hero/rail/poster-01.jpg",
+    "assets/hero/rail/poster-02.jpg",
+    "assets/hero/rail/poster-03.jpg",
+    "assets/hero/rail/poster-04.jpg",
+    "assets/hero/rail/poster-05.jpg",
+    "assets/hero/rail/poster-06.jpg",
+    "assets/hero/rail/poster-07.jpg",
+    "assets/hero/rail/poster-08.jpg",
+    "assets/hero/rail/poster-09.jpg",
+    "assets/hero/rail/poster-10.jpg"
+  ],
+
+  /* The masthead background film, and the still that stands in for it.
+     Both are only reached when heroRail above is empty.
+
+     heroPoster is shown the instant the page opens - it is about 90 KB - and
+     the film plays over it as soon as it has arrived. Without it the hero
+     would sit dark for as long as the several megabytes take to download.
+     It is also what someone who has asked their system for less movement
+     sees instead of the loop.
+
+     Either may be left empty. No film: the still stays. Neither: the hero
+     keeps its own deep tone, which is how the page looked before any of
+     this was added. */
+  heroPoster: "assets/hero/hero-poster.jpg",
   heroVideo: "assets/hero/hero.mp4",
+
+  /* THE THREE PHONES IN THE MASTHEAD
+     -----------------------------------------------------------------------
+     One image per phone, in this order: left, centre, right.
+
+         assets/hero/posters/phone-01.jpg
+         assets/hero/posters/phone-02.jpg
+         assets/hero/posters/phone-03.jpg
+
+     To change what the masthead shows, replace a file with your own of the
+     same name. Nothing else needs editing, and the catalogue below is not
+     affected - these are the hero's own artwork, not the template posters.
+
+     Portrait, roughly 9:16. About 420px wide is plenty; they are never
+     displayed larger than about 200px.
+
+     Empty this list and the masthead goes back to cycling the templates
+     from js/templates.js instead. */
+  heroPhonePosters: [
+    "assets/hero/posters/phone-01.jpg",
+    "assets/hero/posters/phone-02.jpg",
+    "assets/hero/posters/phone-03.jpg"
+  ],
 
   /* How long a template carries the NEW badge, in days after createdAt */
   newForDays: 21,
@@ -75,14 +139,19 @@ const SITE_CONFIG = {
 
      To add house warming, baby shower or birthday invitations later, create
      templates/<collection>/... , set collection: "<collection>" on the entry,
-     and add a line here for a nicer heading: */
-  collections: [
-    { key: "hindu",     label: "Hindu Weddings" },
-    { key: "christian", label: "Christian Weddings" },
-    { key: "islamic",   label: "Islamic Weddings" }
+     and add a line here for a nicer heading.
 
-    /* , { key: "housewarming", label: "House Warming" } */
-    /* , { key: "babyshower",   label: "Baby Shower" }   */
-    /* , { key: "birthday",     label: "Birthday" }      */
+     `code` is the prefix every template in that collection is named with:
+     the first Hindu template is HN1, the second HN2, and so on. That code
+     appears under the phone and in the WhatsApp message, so an enquiry
+     names one template and only one. */
+  collections: [
+    { key: "hindu",     label: "Hindu Weddings",     code: "HN" },
+    { key: "christian", label: "Christian Weddings", code: "CH" },
+    { key: "islamic",   label: "Islamic Weddings",   code: "IS" }
+
+    /* , { key: "housewarming", label: "House Warming", code: "HW" } */
+    /* , { key: "babyshower",   label: "Baby Shower",   code: "BS" } */
+    /* , { key: "birthday",     label: "Birthday",      code: "BD" } */
   ]
 };

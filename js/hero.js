@@ -4,15 +4,21 @@
    Builds the phone composition on the right of the hero and cycles the
    featured template through it.
 
-   It reads the SAME registry as the rest of the site (js/templates.js), so
-   adding a template later automatically puts it into the hero rotation.
-   Video handling is delegated to Preview (js/preview.js), which already
-   knows how to fall back to the poster, and then to "Preview coming soon",
-   when a preview.mp4 is missing.
+   The masthead never plays film. Three stills, and nothing else.
 
-   Only the phones on screen hold a loaded video. The next one in the
-   rotation is warmed in a single off-screen element, so a catalogue of
-   50-100+ templates never means 50-100+ downloads.
+   There are two ways to fill them, and the first one wins:
+
+     1. heroPhonePosters in config/site-config.js names three images of your
+        own, in assets/hero/posters/. Each phone takes one, in order, and
+        they stay put - change a file, and that phone changes. Nothing about
+        the catalogue touches them.
+
+     2. With that list empty, the stage falls back to reading the SAME
+        registry as the rest of the site (js/templates.js) and cycles the
+        featured template through the phones, using each template's own
+        poster.
+
+   Either way the phones keep moving between the three positions.
    ========================================================================= */
 
 var HeroStage = (function () {
@@ -28,8 +34,8 @@ var HeroStage = (function () {
   var pool = [];
   var queue = [];
   var timer = null;
-  var warmer = null;
   var running = false;
+  var fixed = [];            /* the hero's own posters, when it has been given some */
 
   function reduced() {
     return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -45,6 +51,19 @@ var HeroStage = (function () {
     return String(value === undefined || value === null ? '' : value)
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  /* The masthead's own three posters, if they have been set. These are
+     deliberately NOT the template posters: the hero is the first thing a
+     visitor sees and its artwork should be chosen, not inherited from
+     whichever templates happen to be newest. */
+  function heroPosters() {
+    var cfg = (typeof SITE_CONFIG === 'object' && SITE_CONFIG) ? SITE_CONFIG : {};
+    var list = Array.isArray(cfg.heroPhonePosters) ? cfg.heroPhonePosters : [];
+
+    return list.filter(function (src) {
+      return typeof src === 'string' && src.length > 0;
+    }).slice(0, SLOTS.length);
   }
 
   /* ---------------------------------------------------------------------
@@ -105,13 +124,13 @@ var HeroStage = (function () {
   function phoneElement() {
     var wrap = document.createElement('div');
     wrap.className = 'phone hero__phone';
+    /* No <video> at all. The masthead is the first thing that loads on the
+       page and the last place that should be spending a visitor's data:
+       three stills say exactly as much as three films here. */
     wrap.innerHTML = '' +
       '<div class="phone__body">' +
         '<div class="phone__screen">' +
           '<img class="phone__poster" alt="" draggable="false" decoding="async">' +
-          '<video class="phone__video" muted loop playsinline autoplay preload="none"' +
-                 ' disablepictureinpicture' +
-                 ' controlslist="nodownload noplaybackrate noremoteplayback"></video>' +
           '<p class="phone__coming" hidden>Preview<br>coming soon</p>' +
           '<span class="phone__sheen" aria-hidden="true"></span>' +
           '<span class="watermark" aria-hidden="true">' + esc(brand()) + '</span>' +
@@ -136,39 +155,19 @@ var HeroStage = (function () {
 
     phone.template = entry;
     phone.el.setAttribute('data-template', entry.id || entry.name || '');
-    Preview.open(phone.screen, {
-      src: entry.previewPath || '',
-      poster: entry.posterPath || ''
-    });
+    Preview.still(phone.screen, { poster: entry.posterPath || '' });
   }
 
-  /* Warm the next video and poster in the background so the swap is not the
-     first time the browser has seen the file. */
+  /* Warm the next poster so the swap is not the first time the browser has
+     seen the file. One small image, and only if it is not already known to
+     be missing. */
   function warm(entry) {
-    if (!entry) { return; }
+    if (!entry || !entry.posterPath) { return; }
+    if (Preview.isDead && Preview.isDead(entry.posterPath)) { return; }
 
-    if (entry.posterPath) {
-      var img = new Image();
-      img.src = entry.posterPath;
-    }
-
-    if (!warmer) {
-      warmer = document.createElement('video');
-      warmer.muted = true;
-      warmer.preload = 'auto';
-      warmer.setAttribute('playsinline', '');
-      warmer.className = 'hero__warmer';
-      stage.appendChild(warmer);
-    }
-
-    /* Nothing to warm if the engine has already found this file missing -
-       otherwise every turn of the rotation asks for it again. */
-    if (Preview.isDead && Preview.isDead(entry.previewPath)) { return; }
-
-    if (entry.previewPath && warmer.getAttribute('src') !== entry.previewPath) {
-      warmer.setAttribute('src', entry.previewPath);
-      try { warmer.load(); } catch (err) { /* nothing to do */ }
-    }
+    var img = new Image();
+    img.decoding = 'async';
+    img.src = entry.posterPath;
   }
 
   /* left -> center -> right -> left */
@@ -179,6 +178,11 @@ var HeroStage = (function () {
       phones[i].slot = (phones[i].slot + 1) % slots.length;
     }
     applySlots();
+
+    /* A chosen set has nothing to swap in. The phones simply carry their own
+       poster between the three positions, which is the movement the stage was
+       built for in the first place. */
+    if (fixed.length) { return; }
 
     /* The phone that has just arrived at the back takes the next template:
        it is the least prominent now, and it is what the viewer will see
@@ -209,22 +213,6 @@ var HeroStage = (function () {
     timer = null;
   }
 
-  function pauseVideos(pause) {
-    for (var i = 0; i < phones.length; i += 1) {
-      var video = phones[i].el.querySelector('.phone__video');
-      if (!video) { continue; }
-
-      try {
-        if (pause) {
-          video.pause();
-        } else {
-          var attempt = video.play();
-          if (attempt && attempt.catch) { attempt.catch(function () {}); }
-        }
-      } catch (err) { /* nothing to do */ }
-    }
-  }
-
   /* While a window is being dragged the phones should settle instantly at
      their new size rather than gliding after the cursor. */
   function watchResize() {
@@ -247,13 +235,8 @@ var HeroStage = (function () {
 
     var observer = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          pauseVideos(false);
-          start();
-        } else {
-          pauseVideos(true);
-          stop();
-        }
+        if (entry.isIntersecting) { start(); }
+        else { stop(); }
       });
     }, { threshold: 0.15 });
 
@@ -268,26 +251,30 @@ var HeroStage = (function () {
     stage = document.getElementById('hero-stage');
     if (!stage) { return; }
 
+    fixed = heroPosters();
     pool = buildPool();
 
-    /* no usable preview anywhere: drop the stage rather than show empty
-       frames, and let the copy take the full width */
-    if (!pool.length) {
+    /* nothing chosen and nothing in the registry: drop the stage rather than
+       show empty frames, and let the copy take the full width */
+    if (!fixed.length && !pool.length) {
       stage.remove();
       var hero = document.querySelector('.hero');
       if (hero) { hero.classList.add('hero--solo'); }
       return;
     }
 
-    var count = Math.min(3, pool.length);
+    var count = fixed.length ? fixed.length : Math.min(SLOTS.length, pool.length);
     slots = (count === 3) ? SLOTS.slice()
           : (count === 2) ? ['left', 'center']
           : ['center'];
 
-    var picks = shuffled(pool).slice(0, count);
-    queue = shuffled(pool).filter(function (entry) {
-      return picks.indexOf(entry) === -1;
-    });
+    var picks = [];
+    if (!fixed.length) {
+      picks = shuffled(pool).slice(0, count);
+      queue = shuffled(pool).filter(function (entry) {
+        return picks.indexOf(entry) === -1;
+      });
+    }
 
     /* centre is built last so it sits on top even before the CSS lands */
     for (var i = 0; i < count; i += 1) {
@@ -302,13 +289,20 @@ var HeroStage = (function () {
       };
 
       phones.push(phone);
-      setTemplate(phone, picks[i]);
+
+      if (fixed.length) {
+        /* one named image per phone, in the order they are listed */
+        el.setAttribute('data-hero-poster', String(i + 1));
+        Preview.still(phone.screen, { poster: fixed[i] });
+      } else {
+        setTemplate(phone, picks[i]);
+      }
     }
 
     applySlots();
     stage.classList.add('is-built');
     watchResize();
-    warm(queue.length ? queue[0] : null);
+    if (!fixed.length) { warm(queue.length ? queue[0] : null); }
 
     watchViewport();
     start();
