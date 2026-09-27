@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>RagaHru — Premium Digital Wedding Invitations</title>
-<meta name="description" content="RagaHru — the invitation, beautifully reimagined. Premium wedding websites for Hindu, Christian and Islamic ceremonies.">
-<meta name="theme-color" content="#211C18">
+<title>RagaHru — Wedding invitation websites</title>
+<meta name="description" content="Wedding invitation websites for Hindu, Christian and Islamic weddings. Choose a design, share one link on WhatsApp, and it goes live within 24 hours.">
+<meta name="theme-color" content="#4A1520">
 <meta name="robots" content="index, follow">
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="RagaHru">
-<meta property="og:title" content="RagaHru">
-<meta property="og:description" content="The invitation, beautifully reimagined. Premium wedding websites for Hindu, Christian and Islamic ceremonies.">
+<meta property="og:title" content="RagaHru — the melody of every moment">
+<meta property="og:description" content="Wedding invitation websites your guests open straight from WhatsApp, with music, RSVP and your languages.">
 <!-- The card WhatsApp, Instagram and Facebook show when the link is shared.
      Some scrapers will only take a full address: once ragahru.com is live,
      change this one line to the absolute URL, e.g.
@@ -24,12 +24,14 @@
 <link rel="icon" href="assets/logo/favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="assets/logo/apple-touch-icon.png">
 
+<!-- Cormorant Garamond is the face of the RagaHru wordmark; Anek Latin
+     (Ek Type) sets the text and draws a true rupee sign. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Playfair+Display:wght@500;600&family=Inter:wght@300;400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anek+Latin:wght@300..700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap">
 
-<link rel="stylesheet" href="css/style.css">
-<link rel="stylesheet" href="css/responsive.css">
+<!-- the whole visual system, in one file -->
+<link rel="stylesheet" href="css/site.css">
 
 <script>
   /* Held for a single beat so the opening sequence starts from stillness.
@@ -39,6 +41,7 @@
   (function () {
     var root = document.documentElement;
     root.className += " is-booting";
+
     window.setTimeout(function () {
       if (root.className.indexOf("is-ready") === -1) {
         root.className += " is-ready";
@@ -50,45 +53,36 @@
 </head>
 
 <body>
-<!-- Season sale: shown once per browsing session, about four seconds -->
-<div class="sale" id="season-sale" role="dialog" aria-modal="true" aria-label="RagaHru season sale" hidden>
-  <div class="sale__inner">
-    <!-- The offer plate. Prices live here, in one place: edit them together
-         with the Save figure if the offer ever changes. -->
-    <div class="sale__plate">
-      <img class="sale__logo" data-logo alt="RagaHru" draggable="false">
-      <p class="sale__wordmark">RagaHru</p>
-
-      <span class="sale__rule" aria-hidden="true"></span>
-
-      <p class="sale__eyebrow">Season Sale</p>
-
-      <p class="sale__price">
-        <span class="sale__was">&#8377;1,499</span>
-        <span class="sale__now">&#8377;999</span>
-      </p>
-
-      <p class="sale__save">Save &#8377;500</p>
-
-      <span class="sale__rule sale__rule--wide" aria-hidden="true"></span>
-
-      <p class="sale__line">Your wedding website, live in 24 hours.</p>
-      <p class="sale__tag">Create. Share. Celebrate.</p>
-    </div>
+<!-- SEASON SALE — a slim bar that stays in view while visitors browse, and
+     never stands between them and the designs. It has no close button: the
+     offer stays on screen for the whole visit.
+     The prices live here, in one place: edit them together with the Save
+     figure if the offer changes. To end the sale, delete this block and set
+     saleLabel to "" in config/site-config.js (which removes the tags beside
+     the prices too). -->
+<aside class="promo" id="promo" aria-label="Season sale">
+  <div class="promo__inner">
+    <p class="promo__text">
+      <span class="promo__label">Season sale</span>
+      <span class="promo__sep" aria-hidden="true"></span>
+      <span class="promo__offer"><span class="promo__what">Wedding websites </span><span class="promo__now">&#8377;999</span>
+        <s class="promo__was"><span class="visually-hidden">was </span>&#8377;1,499</s></span>
+      <span class="promo__sep" aria-hidden="true"></span>
+      <span class="promo__save">Save &#8377;500</span>
+    </p>
+    <a class="promo__link" href="#collections">See the designs <svg viewBox="0 0 20 12" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true" focusable="false"><path d="M1 6h17M13.5 1.5 18 6l-4.5 4.5"/></svg></a>
   </div>
-
-  <button class="sale__skip" type="button" id="sale-skip">Skip</button>
-</div>
+</aside>
 
 <div class="veil" aria-hidden="true"></div>
 
-<a class="skip-link" href="#collections">Skip to the collections</a>
+<a class="skip-link" href="#collections">Skip to the designs</a>
 
 <header class="site-header boot" style="--boot-delay:120ms" id="top">
   <div class="wrap site-header__inner">
     <a class="brand" href="#top" aria-label="RagaHru — home">
       <img class="brand__logo" data-logo="mark" alt="" aria-hidden="true" draggable="false">
-      <span class="brand__text">RagaHru<span class="brand__dot" aria-hidden="true"></span></span>
+      <span class="brand__text">RagaHru</span>
     </a>
 
     <nav class="site-nav boot" style="--boot-delay:520ms" aria-label="Wedding collections">
@@ -98,6 +92,11 @@
         <li><a class="site-nav__link" href="#islamic">Islamic</a></li>
       </ul>
     </nav>
+
+    <a class="site-header__cta boot" style="--boot-delay:600ms" id="header-wa" href="#" target="_blank" rel="noopener noreferrer">
+      <svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.64.08-.3-.15-1.26-.47-2.39-1.48-.88-.79-1.48-1.76-1.65-2.06-.18-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.91-2.2-.25-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.87 1.22 3.07c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.7.25-1.29.17-1.42-.07-.12-.27-.2-.57-.34M12.05 21.79h-.01c-1.77 0-3.5-.48-5.03-1.38l-.36-.22-3.74.99 1-3.65-.24-.38a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.88 9.89-9.88 2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 0 1 2.89 6.99c0 5.45-4.43 9.89-9.88 9.89m8.41-18.3A11.82 11.82 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.15 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.69 1.45c6.55 0 11.89-5.34 11.89-11.89 0-3.18-1.24-6.17-3.48-8.42"/></svg>
+      <span>Enquire</span>
+    </a>
   </div>
 </header>
 
@@ -105,80 +104,84 @@
   <section class="hero" aria-labelledby="hero-title">
 
     <!-- Optional background film. It stays hidden until a real file loads,
-         so the hero is unchanged when assets/hero/hero.mp4 is absent. -->
+         and the poster rail (heroRail in config/site-config.js) takes this
+         place whenever one is set. -->
     <video class="hero__bg" id="hero-bg" aria-hidden="true"
            muted loop playsinline preload="none"
            disablepictureinpicture
            controlslist="nodownload noplaybackrate noremoteplayback"></video>
 
-    <!-- the espresso ground, kept ON TOP of the film so the dual tone and the
-         headline contrast never depend on what the video happens to show -->
+    <!-- the silk ground, kept ON TOP of the film or rail so the headline's
+         contrast never depends on what moves behind it -->
     <span class="hero__tint" aria-hidden="true"></span>
 
     <div class="wrap hero__inner">
 
       <div class="hero__copy">
-        <p class="hero__wordmark boot" style="--boot-delay:150ms">RagaHru</p>
+        <p class="hero__tagline boot" style="--boot-delay:150ms">The melody of every moment</p>
 
-        <!-- the champagne line draws itself open, the RagaHru signature -->
+        <!-- the gold line draws itself open, the RagaHru signature -->
         <span class="signature signature--hero" aria-hidden="true"></span>
 
         <h1 class="hero__title" id="hero-title">
-          <span class="hero__line boot" style="--boot-delay:450ms">The invitation,</span>
-          <em class="hero__line boot" style="--boot-delay:560ms">beautifully reimagined.</em>
+          <span class="hero__line boot" style="--boot-delay:420ms">Your wedding,</span>
+          <span class="hero__line boot" style="--boot-delay:540ms">in one link.</span>
         </h1>
 
-        <p class="hero__sub boot" style="--boot-delay:650ms">
-          Premium wedding websites,
-          made for your celebration.
+        <p class="hero__sub boot" style="--boot-delay:660ms">
+          An invitation website your guests open straight from WhatsApp, with
+          music, RSVP and your languages. Choose a design and it goes live
+          within 24 hours.
         </p>
 
-        <p class="hero__note boot" style="--boot-delay:720ms">
-          <span class="hero__note-key">Website live in 24 hours</span>
-          <span class="hero__note-sep" aria-hidden="true"></span>
-          <span class="hero__note-rest">Ready to share with friends &amp; family</span>
-        </p>
+        <div class="hero__actions boot" style="--boot-delay:760ms">
+          <a class="btn btn--zari" href="#collections">
+            <span>See the designs</span>
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 5v14M6.5 13.5 12 19l5.5-5.5"/></svg>
+          </a>
+          <a class="btn btn--ghost" id="hero-wa" href="#" target="_blank" rel="noopener noreferrer">
+            <svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.64.08-.3-.15-1.26-.47-2.39-1.48-.88-.79-1.48-1.76-1.65-2.06-.18-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.91-2.2-.25-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.87 1.22 3.07c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.7.25-1.29.17-1.42-.07-.12-.27-.2-.57-.34M12.05 21.79h-.01c-1.77 0-3.5-.48-5.03-1.38l-.36-.22-3.74.99 1-3.65-.24-.38a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.88 9.89-9.88 2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 0 1 2.89 6.99c0 5.45-4.43 9.89-9.88 9.89m8.41-18.3A11.82 11.82 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.15 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.69 1.45c6.55 0 11.89-5.34 11.89-11.89 0-3.18-1.24-6.17-3.48-8.42"/></svg>
+            <span>Ask on WhatsApp</span>
+          </a>
+        </div>
 
-        <a class="hero__explore boot" style="--boot-delay:950ms" href="#collections">
-          <span class="hero__explore-text">Explore wedding collections</span>
-          <span class="hero__explore-arrow" aria-hidden="true">
-            <svg viewBox="0 0 12 20" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true">
-              <path d="M6 1v17M1.5 13.5 6 18.5l4.5-5"/>
-            </svg>
-          </span>
-        </a>
+        <ul class="hero__facts boot" style="--boot-delay:860ms">
+          <li><span>Live within 24 hours</span></li>
+          <li><span>Designs from <strong data-price="from">&#8377;999</strong></span></li>
+        </ul>
       </div>
 
-      <!-- Three phones, built by js/hero.js from the same template registry.
-           Decorative: every template is presented properly in the collections
-           below, so this showcase is hidden from assistive technology. -->
+      <!-- Three phones, built by js/hero.js. Decorative: every design is
+           presented properly in the collections below, so this showcase is
+           hidden from assistive technology. -->
       <div class="hero__stage" id="hero-stage" style="--boot-delay:750ms" aria-hidden="true"></div>
 
     </div>
   </section>
 
-  <!-- The custom build is offered before the catalogue, not after it: a
-       visitor who wants something of their own should meet that option
-       while they are still deciding, rather than at the end of the page. -->
+  <!-- the zari border: the woven gold hem of the silk above -->
+  <div class="zari" aria-hidden="true"></div>
+
+  <!-- The custom build is offered before the catalogue on a wide screen, so
+       a visitor who wants something of their own meets that option while
+       still deciding. On a phone js/luxe.js moves it after the designs. -->
   <section class="custom" aria-labelledby="custom-title">
     <div class="wrap">
-      <div class="custom__inner">
-      <p class="custom__eyebrow reveal">Custom Build</p>
-      <h2 class="custom__title reveal" id="custom-title" style="--reveal-delay:80ms">
-        Need something personal?
-      </h2>
-      <p class="custom__desc reveal" style="--reveal-delay:150ms">
-        A wedding website designed around your story &mdash; your palette,
-        your rituals, your languages.
-      </p>
+      <div class="custom__inner reveal">
+        <span class="custom__frame" aria-hidden="true"></span>
+        <h2 class="custom__title" id="custom-title">Want a design made just for you?</h2>
+        <p class="custom__desc">
+          A wedding website designed around your story: your colours,
+          your rituals, your languages.
+        </p>
 
-      <p class="price price--custom reveal" style="--reveal-delay:210ms">
-        <span class="price__now" id="custom-price">&#8377;1,499</span>
-      </p>
+        <p class="price price--custom">
+          <span class="price__now" id="custom-price">&#8377;1,499</span>
+        </p>
 
-      <a class="btn btn--solid custom__cta reveal" id="custom-wa" style="--reveal-delay:270ms"
-         href="#" target="_blank" rel="noopener noreferrer">
-        <svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.64.08-.3-.15-1.26-.47-2.39-1.48-.88-.79-1.48-1.76-1.65-2.06-.18-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.91-2.2-.25-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.87 1.22 3.07c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.7.25-1.29.17-1.42-.07-.12-.27-.2-.57-.34M12.05 21.79h-.01c-1.77 0-3.5-.48-5.03-1.38l-.36-.22-3.74.99 1-3.65-.24-.38a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.88 9.89-9.88 2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 0 1 2.89 6.99c0 5.45-4.43 9.89-9.88 9.89m8.41-18.3A11.82 11.82 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.15 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.69 1.45c6.55 0 11.89-5.34 11.89-11.89 0-3.18-1.24-6.17-3.48-8.42"/></svg><span>Enquire on WhatsApp</span>
+        <a class="btn btn--solid custom__cta" id="custom-wa"
+           href="#" target="_blank" rel="noopener noreferrer">
+          <svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.64.08-.3-.15-1.26-.47-2.39-1.48-.88-.79-1.48-1.76-1.65-2.06-.18-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.91-2.2-.25-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.87 1.22 3.07c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.7.25-1.29.17-1.42-.07-.12-.27-.2-.57-.34M12.05 21.79h-.01c-1.77 0-3.5-.48-5.03-1.38l-.36-.22-3.74.99 1-3.65-.24-.38a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.88 9.89-9.88 2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 0 1 2.89 6.99c0 5.45-4.43 9.89-9.88 9.89m8.41-18.3A11.82 11.82 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.15 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.69 1.45c6.55 0 11.89-5.34 11.89-11.89 0-3.18-1.24-6.17-3.48-8.42"/></svg><span>Enquire on WhatsApp</span>
         </a>
       </div>
     </div>
@@ -190,18 +193,133 @@
   <p class="collections__empty" id="collections-empty" hidden>
     New wedding websites are being prepared. Please check back shortly.
   </p>
+
+  <!-- How it works. A real sequence, so it is numbered. -->
+  <section class="process" id="how-it-works" aria-labelledby="process-title">
+    <div class="wrap">
+      <header class="process__head">
+        <h2 class="process__title reveal mask-line" id="process-title">
+          From first look to live in a day.
+        </h2>
+      </header>
+
+      <ol class="process__steps">
+        <li class="process__step reveal" style="--reveal-delay:120ms">
+          <span class="process__num" aria-hidden="true">01</span>
+          <h3 class="process__name">Choose your design</h3>
+          <p class="process__text">Browse the collections and play any preview to see it move.</p>
+        </li>
+        <li class="process__step reveal" style="--reveal-delay:220ms">
+          <span class="process__num" aria-hidden="true">02</span>
+          <h3 class="process__name">Share your details</h3>
+          <p class="process__text">Message us on WhatsApp with your names, dates and venues.</p>
+        </li>
+        <li class="process__step reveal" style="--reveal-delay:320ms">
+          <span class="process__num" aria-hidden="true">03</span>
+          <h3 class="process__name">Live in 24 hours</h3>
+          <p class="process__text">Your wedding website goes live, ready to share with family and friends.</p>
+        </li>
+      </ol>
+
+      <div class="process__cta reveal" style="--reveal-delay:360ms">
+        <a class="btn btn--solid" id="process-wa" href="#" target="_blank" rel="noopener noreferrer">
+          <svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.64.08-.3-.15-1.26-.47-2.39-1.48-.88-.79-1.48-1.76-1.65-2.06-.18-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.91-2.2-.25-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.87 1.22 3.07c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.7.25-1.29.17-1.42-.07-.12-.27-.2-.57-.34M12.05 21.79h-.01c-1.77 0-3.5-.48-5.03-1.38l-.36-.22-3.74.99 1-3.65-.24-.38a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.88 9.89-9.88 2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 0 1 2.89 6.99c0 5.45-4.43 9.89-9.88 9.89m8.41-18.3A11.82 11.82 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.15 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.69 1.45c6.55 0 11.89-5.34 11.89-11.89 0-3.18-1.24-6.17-3.48-8.42"/></svg><span>Start on WhatsApp</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUESTIONS. What a couple needs to know before writing, so the message
+       they send is the order rather than the first question. Edit the
+       answers here; the prices marked data-price are filled in from
+       config/site-config.js and js/templates.js. -->
+  <section class="faq" id="questions" aria-labelledby="faq-title">
+    <div class="wrap faq__inner">
+      <header class="faq__head">
+        <h2 class="faq__title reveal mask-line" id="faq-title">Questions couples ask</h2>
+        <p class="faq__lead reveal" style="--reveal-delay:120ms">
+          Anything we haven&rsquo;t answered here, ask us on WhatsApp.
+        </p>
+        <div class="reveal" style="--reveal-delay:200ms">
+          <a class="btn" id="faq-wa" href="#" target="_blank" rel="noopener noreferrer">
+            <svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.64.08-.3-.15-1.26-.47-2.39-1.48-.88-.79-1.48-1.76-1.65-2.06-.18-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.91-2.2-.25-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.87 1.22 3.07c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.7.25-1.29.17-1.42-.07-.12-.27-.2-.57-.34M12.05 21.79h-.01c-1.77 0-3.5-.48-5.03-1.38l-.36-.22-3.74.99 1-3.65-.24-.38a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.88 9.89-9.88 2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 0 1 2.89 6.99c0 5.45-4.43 9.89-9.88 9.89m8.41-18.3A11.82 11.82 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.15 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.69 1.45c6.55 0 11.89-5.34 11.89-11.89 0-3.18-1.24-6.17-3.48-8.42"/></svg>
+            <span>Ask on WhatsApp</span>
+          </a>
+        </div>
+      </header>
+
+      <div class="faq__list reveal" style="--reveal-delay:160ms">
+        <details class="faq__item" name="faq">
+          <summary class="faq__q">How do we order a design?<span class="faq__mark" aria-hidden="true"></span></summary>
+          <div class="faq__a selectable">
+            <p>Tap <strong>Enquire</strong> under the design you like. WhatsApp opens with a message that already names the design, such as HN01, so you only need to add your details and send it.</p>
+          </div>
+        </details>
+
+        <details class="faq__item" name="faq">
+          <summary class="faq__q">What do you need from us?<span class="faq__mark" aria-hidden="true"></span></summary>
+          <div class="faq__a selectable">
+            <p>Your names, your wedding dates and your venues. If the design shows photographs, send the ones you&rsquo;d like to use.</p>
+          </div>
+        </details>
+
+        <details class="faq__item" name="faq">
+          <summary class="faq__q">How soon will it be ready?<span class="faq__mark" aria-hidden="true"></span></summary>
+          <div class="faq__a selectable">
+            <p>Your website goes live within 24 hours of receiving your details.</p>
+          </div>
+        </details>
+
+        <details class="faq__item" name="faq">
+          <summary class="faq__q">How do our guests open it?<span class="faq__mark" aria-hidden="true"></span></summary>
+          <div class="faq__a selectable">
+            <p>It&rsquo;s a link. Share it on WhatsApp, Instagram or by text, and it opens in the phone&rsquo;s browser. There&rsquo;s nothing for guests to download or install.</p>
+          </div>
+        </details>
+
+        <details class="faq__item" name="faq">
+          <summary class="faq__q">Can the invitation be in our language?<span class="faq__mark" aria-hidden="true"></span></summary>
+          <div class="faq__a selectable">
+            <p>Designs marked <strong>Languages</strong> show your invitation in more than one language, and guests switch between them with a tap: English and Kannada, for example.</p>
+          </div>
+        </details>
+
+        <details class="faq__item" name="faq">
+          <summary class="faq__q">Can guests reply to the invitation?<span class="faq__mark" aria-hidden="true"></span></summary>
+          <div class="faq__a selectable">
+            <p>Yes, on designs marked <strong>RSVP</strong>. Guests tell you they&rsquo;re coming from the website itself.</p>
+          </div>
+        </details>
+
+        <details class="faq__item" name="faq">
+          <summary class="faq__q">None of these fit. Can you make one?<span class="faq__mark" aria-hidden="true"></span></summary>
+          <div class="faq__a selectable">
+            <p>Yes. A custom wedding website is designed around your story, your colours and your rituals, for <strong data-price="custom">&#8377;1,499</strong>. Ask us on WhatsApp to begin.</p>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
 </main>
 
 
 <footer class="site-footer">
+  <!-- the silk returns, with its border along the top -->
+  <div class="zari zari--footer" aria-hidden="true"></div>
+
   <div class="wrap site-footer__inner">
     <img class="site-footer__logo" data-logo="mark" alt="" aria-hidden="true" draggable="false">
     <p class="site-footer__brand">RagaHru</p>
 
-    <p class="site-footer__statement">
-      Digital wedding invitations,<br>
-      crafted to be remembered.
-    </p>
+    <p class="site-footer__statement">The melody of every moment.</p>
+
+    <nav aria-label="Footer">
+      <ul class="site-footer__nav">
+        <li><a href="#collections">Designs</a></li>
+        <li><a href="#how-it-works">How it works</a></li>
+        <li><a href="#questions">Questions</a></li>
+      </ul>
+    </nav>
 
     <ul class="social">
       <li>
@@ -222,10 +340,19 @@
     </p>
     <p class="site-footer__copy">&copy; <span id="footer-year">2026</span> RagaHru. All rights reserved.</p>
   </div>
+  <p class="site-footer__giant" aria-hidden="true">RagaHru</p>
 </footer>
 
+<!-- Always one tap from a conversation. Appears once the masthead has gone,
+     steps aside for the footer (which has its own link) and for the preview. -->
+<a class="float-wa" id="float-wa" href="#" target="_blank" rel="noopener noreferrer"
+   aria-label="Chat with RagaHru on WhatsApp">
+  <span class="float-wa__icon"><svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.64.08-.3-.15-1.26-.47-2.39-1.48-.88-.79-1.48-1.76-1.65-2.06-.18-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.91-2.2-.25-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.87 1.22 3.07c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.7.25-1.29.17-1.42-.07-.12-.27-.2-.57-.34M12.05 21.79h-.01c-1.77 0-3.5-.48-5.03-1.38l-.36-.22-3.74.99 1-3.65-.24-.38a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.88 9.89-9.88 2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 0 1 2.89 6.99c0 5.45-4.43 9.89-9.88 9.89m8.41-18.3A11.82 11.82 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.15 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.69 1.45c6.55 0 11.89-5.34 11.89-11.89 0-3.18-1.24-6.17-3.48-8.42"/></svg></span>
+  <span class="float-wa__label">Enquire</span>
+</a>
+
 <!-- ============ LARGE PREVIEW MODAL ============ -->
-<div class="modal" id="preview-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" hidden>
+<div class="modal" id="preview-modal" data-lenis-prevent role="dialog" aria-modal="true" aria-labelledby="modal-title" hidden>
   <div class="modal__backdrop" data-modal-close></div>
 
   <div class="modal__panel" role="document">
@@ -260,21 +387,31 @@
     </div>
 
     <div class="modal__info">
-      <p class="modal__eyebrow" id="modal-eyebrow" style="--i:0">Hindu Weddings</p>
+      <p class="modal__eyebrow" id="modal-eyebrow" style="--i:0">Hindu weddings</p>
       <h2 class="modal__title" id="modal-title" style="--i:1">Template</h2>
       <p class="modal__desc selectable" id="modal-desc" style="--i:2"></p>
 
       <ul class="features features--modal" id="modal-features" style="--i:3"></ul>
 
+      <p class="price__deal price__deal--modal" id="modal-deal" style="--i:4" hidden></p>
       <p class="price price--modal" style="--i:4">
         <span class="price__now" id="modal-price"></span>
         <span class="price__was" id="modal-original"></span>
       </p>
 
-      <a class="btn btn--solid" id="modal-wa" style="--i:5" href="#" target="_blank" rel="noopener noreferrer">
-        <svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.64.08-.3-.15-1.26-.47-2.39-1.48-.88-.79-1.48-1.76-1.65-2.06-.18-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.91-2.2-.25-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.87 1.22 3.07c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.7.25-1.29.17-1.42-.07-.12-.27-.2-.57-.34M12.05 21.79h-.01c-1.77 0-3.5-.48-5.03-1.38l-.36-.22-3.74.99 1-3.65-.24-.38a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.88 9.89-9.88 2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 0 1 2.89 6.99c0 5.45-4.43 9.89-9.88 9.89m8.41-18.3A11.82 11.82 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.15 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.69 1.45c6.55 0 11.89-5.34 11.89-11.89 0-3.18-1.24-6.17-3.48-8.42"/></svg>
-        <span>Enquire on WhatsApp</span>
-      </a>
+      <div class="modal__actions" style="--i:5">
+        <a class="btn btn--zari" id="modal-wa" href="#" target="_blank" rel="noopener noreferrer">
+          <svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.64.08-.3-.15-1.26-.47-2.39-1.48-.88-.79-1.48-1.76-1.65-2.06-.18-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.91-2.2-.25-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.87 1.22 3.07c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.7.25-1.29.17-1.42-.07-.12-.27-.2-.57-.34M12.05 21.79h-.01c-1.77 0-3.5-.48-5.03-1.38l-.36-.22-3.74.99 1-3.65-.24-.38a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.88 9.89-9.88 2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 0 1 2.89 6.99c0 5.45-4.43 9.89-9.88 9.89m8.41-18.3A11.82 11.82 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.15 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.69 1.45c6.55 0 11.89-5.34 11.89-11.89 0-3.18-1.24-6.17-3.48-8.42"/></svg>
+          <span>Enquire on WhatsApp</span>
+        </a>
+        <!-- Weddings are decided with family. This sends a link that opens
+             this exact design, through the phone's own share sheet where
+             there is one and WhatsApp everywhere else. -->
+        <button class="btn btn--ghost" id="modal-share" type="button">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 5l7 6.5-7 6.5"/><path d="M21 11.5H11a7.5 7.5 0 0 0-7.5 7.5"/></svg>
+          <span>Share with family</span>
+        </button>
+      </div>
 
       <p class="modal__hint" style="--i:6">Press <kbd>Esc</kbd> to close</p>
     </div>
@@ -283,9 +420,10 @@
 
 <script src="config/site-config.js"></script>
 <script src="js/templates.js"></script>
-<script src="js/sale.js"></script>
 <script src="js/preview.js"></script>
 <script src="js/hero.js"></script>
 <script src="js/app.js"></script>
+<script src="js/vendor/lenis.min.js"></script>
+<script src="js/luxe.js"></script>
 </body>
 </html>

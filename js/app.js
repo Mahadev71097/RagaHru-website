@@ -200,6 +200,27 @@
 
   /* A template counts as new for a configurable window after its createdAt.
      Nothing is hand-flagged: the badge appears and expires on its own. */
+  /* The sale named beside every discounted price. Empty it in site-config and
+     the tags disappear with the offer. */
+  var SALE_LABEL = typeof CONFIG.saleLabel === 'string' ? CONFIG.saleLabel : 'Season Sale';
+
+  /* "Season Sale · Save ₹500", or nothing when the price is not reduced */
+  function dealText(entry) {
+    var saving = Number(entry.originalPrice) - Number(entry.price);
+    if (!SALE_LABEL || !isFinite(saving) || saving <= 0) { return null; }
+    return { label: SALE_LABEL, save: 'Save ' + money(saving) };
+  }
+
+  function dealInner(deal) {
+    return '<span class="price__deal-label">' + esc(deal.label) + '</span>' +
+           '<span class="price__deal-save">' + esc(deal.save) + '</span>';
+  }
+
+  function dealMarkup(entry) {
+    var deal = dealText(entry);
+    return deal ? '<p class="price__deal">' + dealInner(deal) + '</p>' : '';
+  }
+
   var NEW_FOR_DAYS = isFinite(Number(CONFIG.newForDays)) ? Number(CONFIG.newForDays) : 21;
 
   function isNew(entry) {
@@ -266,6 +287,7 @@
            row: descriptions of different lengths then stop pushing the price
            and the buttons out of line with the card beside them */
         '<div class="card__foot">' +
+          dealMarkup(entry) +
           priceMarkup(entry, '') +
           '<a class="btn card__cta" href="' + esc(whatsappLink(entry.name)) + '"' +
              ' target="_blank" rel="noopener noreferrer"' +
@@ -290,7 +312,7 @@
     }).join('');
 
     var count = collection.items.length;
-    var countLabel = count + (count === 1 ? ' Website' : ' Websites');
+    var countLabel = count + (count === 1 ? ' design' : ' designs');
 
     return '' +
       '<section class="collection" id="' + esc(collection.key) + '"' +
@@ -305,7 +327,9 @@
             '<span class="collection__rule" aria-hidden="true"></span>' +
             '<span class="collection__count">' + esc(countLabel) + '</span>' +
           '</header>' +
-          '<div class="grid">' + cards + '</div>' +
+          /* the count lets a short collection centre itself instead of
+             leaving three empty columns beside one design */
+          '<div class="grid" data-count="' + Math.min(count, 4) + '">' + cards + '</div>' +
         '</div>' +
       '</section>';
   }
@@ -431,8 +455,80 @@
     video: null,
     lastFocus: null,
     isOpen: false,
-    timer: null
+    timer: null,
+    currentId: '',
+    prevHash: ''
   };
+
+  /* ---------------------------------------------------------------------
+     an address for every design
+     Weddings are decided with family. A design has a link of its own -
+     ragahru.com/#HN01 - so the one a couple sends to a parent opens that
+     design, not the top of the page. The address follows the preview as it
+     opens and closes, and replaceState keeps it out of the Back history.
+     --------------------------------------------------------------------- */
+
+  var SHARE_MESSAGE = CONFIG.shareMessage ||
+    'Have a look at this wedding invitation design, {template}, from RagaHru:';
+
+  function designFromHash() {
+    var id = '';
+    try { id = decodeURIComponent(String(window.location.hash || '').replace(/^#/, '')); } catch (err) { id = ''; }
+    return (id && byId[id]) ? id : '';
+  }
+
+  function designUrl(id) {
+    return window.location.href.split('#')[0] + '#' + encodeURIComponent(id);
+  }
+
+  function writeHash(hash) {
+    if (!window.history || !history.replaceState) { return; }
+    try {
+      history.replaceState(history.state, '',
+        hash || (window.location.pathname + window.location.search));
+    } catch (err) { /* a sandboxed frame: the address simply stays */ }
+  }
+
+  function triggerFor(id) {
+    if (!/^[\w-]+$/.test(id)) { return null; }
+    return document.querySelector('.card__trigger[data-template="' + id + '"]');
+  }
+
+  /* arriving on #HN01, or moving to it with Back and Forward */
+  function openFromAddress() {
+    var id = designFromHash();
+    if (!id) {
+      if (modal.isOpen) { closeModal(); }
+      return;
+    }
+    if (modal.isOpen && modal.currentId === id) { return; }
+
+    var trigger = triggerFor(id);
+    /* the page behind is brought to the design, so closing the preview
+       lands the visitor where it lives in the catalogue */
+    if (trigger && trigger.scrollIntoView) {
+      try { trigger.scrollIntoView({ block: 'center' }); } catch (err) { trigger.scrollIntoView(); }
+    }
+    openModal(id, trigger);
+  }
+
+  function shareDesign() {
+    var entry = byId[modal.currentId];
+    if (!entry) { return; }
+
+    var url = designUrl(modal.currentId);
+    var text = SHARE_MESSAGE.replace('{template}', entry.name);
+
+    /* the phone's own share sheet, where there is one */
+    if (navigator.share) {
+      navigator.share({ title: BRAND + ' — ' + entry.name, text: text, url: url })
+        .catch(function () { /* closed without sharing: nothing to do */ });
+      return;
+    }
+
+    /* everywhere else, WhatsApp - where the family already is */
+    window.open('https://wa.me/?text=' + encodeURIComponent(text + ' ' + url), '_blank', 'noopener');
+  }
 
   function cacheModal() {
     modal.root = document.getElementById('preview-modal');
@@ -447,6 +543,9 @@
     for (var i = 0; i < closers.length; i += 1) {
       closers[i].addEventListener('click', closeModal);
     }
+
+    var share = document.getElementById('modal-share');
+    if (share) { share.addEventListener('click', shareDesign); }
 
     document.addEventListener('keydown', function (event) {
       if (!modal.isOpen) { return; }
@@ -525,6 +624,17 @@
 
     modal.lastFocus = source || document.activeElement;
 
+    /* the address follows the preview; whatever it said before is put back
+       on close (a collection link such as #hindu, or nothing) */
+    if (!modal.isOpen) {
+      modal.prevHash = designFromHash() ? '' : window.location.hash;
+    }
+    modal.currentId = id;
+    writeHash('#' + encodeURIComponent(id));
+
+    var share = document.getElementById('modal-share');
+    if (share) { share.setAttribute('aria-label', 'Share ' + entry.name + ' with family'); }
+
     document.getElementById('modal-eyebrow').textContent = collectionLabelFor(entry.religion);
     document.getElementById('modal-title').textContent = entry.name;
     document.getElementById('modal-desc').textContent = entry.description || '';
@@ -542,6 +652,13 @@
     } else {
       original.textContent = '';
       original.hidden = true;
+    }
+
+    var dealLine = document.getElementById('modal-deal');
+    if (dealLine) {
+      var deal = dealText(entry);
+      dealLine.innerHTML = deal ? dealInner(deal) : '';
+      dealLine.hidden = !deal;
     }
 
     var wa = document.getElementById('modal-wa');
@@ -613,8 +730,10 @@
     if (!modal.isOpen || !modal.root) { return; }
 
     modal.isOpen = false;
+    modal.currentId = '';
     modal.root.classList.remove('is-open');
     document.body.classList.remove('is-locked');
+    writeHash(modal.prevHash);
 
     var slow = !reduced();
 
@@ -687,7 +806,9 @@
        class toggle - cheap enough to run directly, with no frame callback to
        stall and leave the bar in the wrong state. */
     function measure() {
-      edge = hero ? (hero.offsetTop + hero.offsetHeight - header.offsetHeight) : 0;
+      /* the header's bottom edge on screen - it sits below the sale bar
+         when there is one, so its height alone is not enough */
+      edge = hero ? (hero.offsetTop + hero.offsetHeight - header.getBoundingClientRect().bottom) : 0;
       update();
     }
 
@@ -790,47 +911,41 @@
   }
 
   /* -------------------------------------------------------------------
-     The poster rail.
+     Seamless loops: the rows of posters drifting behind the headline.
 
      The list is laid down twice so the loop has somewhere to land, and the
      track slides by exactly one pass. Both the distance and the duration are
      measured here rather than guessed in CSS: a fixed duration would run the
      posters past at one speed on a phone and a quite different one on a wide
      desktop, because the track is far longer there.
+
+       tracks    the elements that slide
+       sources   the image paths, in order
+       imgClass  the class each image is given
+       speed     pixels per second
+       prefix    the properties written: --<prefix>-shift, --<prefix>-seconds
+       watch     the element that must be on screen for the tracks to move
+       ready     called each time the tracks have been measured
      ------------------------------------------------------------------- */
 
-  var HERO_RAIL_SPEED = 24;        /* px per second - a slow, cinematic drift */
-
-  function buildHeroRail(video, sources) {
-    var hero = video.closest ? video.closest('.hero') : document.querySelector('.hero');
-    if (!hero) { return; }
-
-    var front = railLayer('hero__rail');
-    var back = railLayer('hero__rail hero__rail--back');
-
-    /* the back row starts part-way along, so the two are never in step */
-    back.firstChild.style.animationDelay = '-18s';
-
-    video.parentNode.insertBefore(back, video);
-    video.parentNode.insertBefore(front, video);
-    video.parentNode.removeChild(video);
-
+  function seamlessLoop(o) {
+    var measured = false;
     var loaded = 0;
-    var wanted = front.querySelectorAll('img').length;
 
-    function ready() {
-      loaded += 1;
-      /* measured once most of the row is in, so the widths are real */
-      if (loaded >= Math.min(wanted, sources.length)) { measure(); }
-    }
-
-    [front, back].forEach(function (layer) {
-      var imgs = layer.querySelectorAll('img');
+    o.tracks.forEach(function (track) {
+      if (!track.firstChild) { fill(track, 2); }
+      var imgs = track.querySelectorAll('img');
       for (var i = 0; i < imgs.length; i += 1) {
         imgs[i].addEventListener('load', ready);
         imgs[i].addEventListener('error', ready);
       }
     });
+
+    function ready() {
+      loaded += 1;
+      /* measured once one full list is in, so the widths are real */
+      if (loaded === o.sources.length) { measure(); }
+    }
 
     /* One pass has to be at least as wide as the screen, or the moment it
        has slid away there is nothing behind it yet and a bare strip opens at
@@ -842,8 +957,7 @@
       var width = window.innerWidth || document.documentElement.clientWidth;
       var refilled = false;
 
-      [front, back].forEach(function (layer) {
-        var track = layer.firstChild;
+      o.tracks.forEach(function (track) {
         var copies = Number(track.getAttribute('data-copies')) || 2;
         var setWidth = track.scrollWidth / copies;
         if (!setWidth) { return; }
@@ -861,43 +975,41 @@
         return;
       }
 
-      [front, back].forEach(function (layer) {
-        var track = layer.firstChild;
+      o.tracks.forEach(function (track) {
         /* one pass is half the track: the list is always laid an even
            number of times, so the two halves are identical */
         var pass = track.scrollWidth / 2;
         if (!pass) { return; }
 
-        track.style.setProperty('--rail-shift', pass + 'px');
-        track.style.setProperty('--rail-seconds', (pass / HERO_RAIL_SPEED).toFixed(2) + 's');
+        track.style.setProperty('--' + o.prefix + '-shift', pass + 'px');
+        track.style.setProperty('--' + o.prefix + '-seconds', (pass / o.speed).toFixed(2) + 's');
       });
 
-      document.documentElement.classList.add('has-hero-rail');
+      measured = true;
+      o.ready();
     }
 
-    /* a stalled `load` must never leave the masthead empty */
+    /* a stalled `load` must never leave the row empty */
     window.setTimeout(function () {
-      if (!document.documentElement.classList.contains('has-hero-rail')) { measure(); }
+      if (!measured) { measure(); }
     }, 2200);
 
-    /* Nothing should be drifting while the masthead is off screen. The track
-       is a large promoted layer - a few thousand pixels of poster - and there
+    /* Nothing should be moving while the masthead is off screen. A track is
+       a large promoted layer - a few thousand pixels of poster - and there
        is no reason to keep a compositor and a battery busy moving it where
        nobody is looking. */
-    if (typeof window.IntersectionObserver === 'function') {
+    if (typeof window.IntersectionObserver === 'function' && o.watch) {
       new IntersectionObserver(function (entries) {
         entries.forEach(function (entry) {
-          [front, back].forEach(function (layer) {
-            var track = layer.firstChild;
-            if (!track) { return; }
+          o.tracks.forEach(function (track) {
             /* '' hands it back to the stylesheet, which runs it */
             track.style.animationPlayState = entry.isIntersecting ? '' : 'paused';
           });
         });
-      }, { threshold: 0 }).observe(hero);
+      }, { threshold: 0 }).observe(o.watch);
     }
 
-    /* the track is sized from the viewport, so a resize re-measures it */
+    /* the tracks are sized from the viewport, so a resize re-measures them */
     var settle = null;
     window.addEventListener('resize', function () {
       window.clearTimeout(settle);
@@ -910,10 +1022,10 @@
       while (track.firstChild) { track.removeChild(track.firstChild); }
 
       for (var pass = 0; pass < copies; pass += 1) {
-        for (var i = 0; i < sources.length; i += 1) {
+        for (var i = 0; i < o.sources.length; i += 1) {
           var img = document.createElement('img');
-          img.className = 'hero__rail-poster';
-          img.src = sources[i];
+          img.className = o.imgClass;
+          img.src = o.sources[i];
           img.alt = '';
           img.decoding = 'async';
           img.draggable = false;
@@ -928,19 +1040,59 @@
 
       track.setAttribute('data-copies', String(copies));
     }
+  }
 
-    function railLayer(className) {
-      var layer = document.createElement('div');
-      layer.className = className;
-      layer.setAttribute('aria-hidden', 'true');
+  /* an empty, decorative layer holding one track */
+  function loopLayer(className, trackClass) {
+    var layer = document.createElement('div');
+    layer.className = className;
+    layer.setAttribute('aria-hidden', 'true');
 
-      var track = document.createElement('div');
-      track.className = 'hero__rail-track';
-      fill(track, 2);
+    var track = document.createElement('div');
+    track.className = trackClass;
+    layer.appendChild(track);
+    return layer;
+  }
 
-      layer.appendChild(track);
-      return layer;
-    }
+  function imageList(list) {
+    return Array.isArray(list) ? list.filter(function (src) {
+      return typeof src === 'string' && src.length > 0;
+    }) : [];
+  }
+
+  /* ---- the poster rail: three rows drifting behind the headline ----
+     A small row along the top and another along the foot, both rolling to
+     the right, with the large row between them rolling to the left - so the
+     whole masthead is filled and the rows pass each other like layers. */
+
+  var HERO_RAIL_SPEED = 24;        /* px per second - a slow, cinematic drift */
+
+  function buildHeroRail(video, sources) {
+    var hero = video.closest ? video.closest('.hero') : document.querySelector('.hero');
+    if (!hero) { return; }
+
+    var front = loopLayer('hero__rail', 'hero__rail-track');
+    var back = loopLayer('hero__rail hero__rail--back', 'hero__rail-track');
+    var low = loopLayer('hero__rail hero__rail--low', 'hero__rail-track');
+
+    /* the small rows start part-way along, so no two are ever in step */
+    back.firstChild.style.animationDelay = '-18s';
+    low.firstChild.style.animationDelay = '-52s';
+
+    video.parentNode.insertBefore(back, video);
+    video.parentNode.insertBefore(low, video);
+    video.parentNode.insertBefore(front, video);
+    video.parentNode.removeChild(video);
+
+    seamlessLoop({
+      tracks: [front.firstChild, back.firstChild, low.firstChild],
+      sources: sources,
+      imgClass: 'hero__rail-poster',
+      speed: HERO_RAIL_SPEED,
+      prefix: 'rail',
+      watch: hero,
+      ready: function () { document.documentElement.classList.add('has-hero-rail'); }
+    });
   }
 
   /* Replaces the background film element with a plain image. The hero keeps
@@ -979,9 +1131,7 @@
 
     /* A rail of posters, if one has been given, takes the masthead. It is
        lighter than a film by an order of magnitude and it never stops. */
-    var rail = Array.isArray(CONFIG.heroRail) ? CONFIG.heroRail.filter(function (src) {
-      return typeof src === 'string' && src.length > 0;
-    }) : [];
+    var rail = imageList(CONFIG.heroRail);
 
     if (rail.length) {
       buildHeroRail(video, rail);
@@ -1071,6 +1221,56 @@
     }
   }
 
+  /* Figures written into the page copy are filled from the same sources as
+     the cards, so a price changed in one place changes everywhere:
+       data-price="from"    the lowest price in js/templates.js
+       data-price="custom"  customPrice in config/site-config.js
+     A figure that cannot be worked out takes its whole line with it rather
+     than showing a wrong one. */
+  function wirePrices() {
+    var lowest = null;
+    for (var i = 0; i < REGISTRY.length; i += 1) {
+      var price = Number(REGISTRY[i] && REGISTRY[i].price);
+      if (isFinite(price) && price > 0 && (lowest === null || price < lowest)) { lowest = price; }
+    }
+
+    var custom = Number(CONFIG.customPrice);
+    var values = {
+      from: lowest,
+      custom: (isFinite(custom) && custom > 0) ? custom : null
+    };
+
+    var slots = document.querySelectorAll('[data-price]');
+    for (var j = 0; j < slots.length; j += 1) {
+      var value = values[slots[j].getAttribute('data-price')];
+      if (value === null || value === undefined) {
+        var line = slots[j].closest ? slots[j].closest('li, p') : null;
+        if (line) { line.hidden = true; }
+        continue;
+      }
+      slots[j].textContent = money(value);
+    }
+  }
+
+  /* The general enquiry - not about any one design - behind the masthead,
+     the header, How it works, Questions and the floating button. */
+  function wireGeneralEnquiry() {
+    var text = CONFIG.generalMessage ||
+      'Hello RagaHru, I would like to know more about your wedding websites. Could you please share the details? Thank you.';
+    var digits = String(CONFIG.whatsappNumber || '').replace(/\D/g, '');
+    var href = (digits.length >= 8 ? 'https://wa.me/' + digits : 'https://wa.me/') +
+               '?text=' + encodeURIComponent(text);
+
+    ['hero-wa', 'header-wa', 'process-wa', 'faq-wa', 'float-wa'].forEach(function (id) {
+      var link = document.getElementById(id);
+      if (!link) { return; }
+      link.setAttribute('href', href);
+      if (!link.getAttribute('aria-label')) {
+        link.setAttribute('aria-label', 'Ask RagaHru a question on WhatsApp');
+      }
+    });
+  }
+
   function wireCustomBuild() {
     var price = document.getElementById('custom-price');
     if (price && isFinite(Number(CONFIG.customPrice))) {
@@ -1112,12 +1312,18 @@
     cacheModal();
     render();
     wireCustomBuild();
+    wirePrices();
+    wireGeneralEnquiry();
     wireSocial();
     copyProtection();
     stickyHeader();
     openingSequence();
 
     revealOnScroll(document.querySelectorAll('.custom .reveal'));
+
+    /* a link to one design opens it, once the page has settled beneath */
+    window.addEventListener('hashchange', openFromAddress);
+    if (designFromHash()) { window.setTimeout(openFromAddress, 450); }
 
     if (String(CONFIG.whatsappNumber || '').replace(/\D/g, '').length < 8) {
       if (window.console && console.info) {

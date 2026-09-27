@@ -1,0 +1,3073 @@
+/* =========================================================================
+   RAGAHRU — site.css
+   The whole visual system in one file.
+
+   The page is dressed like a Mysore silk saree. The masthead, the preview
+   and the footer are the maroon silk; a woven gold zari border runs along
+   their hem; and the designs sit on ivory card stock in between, the way
+   an invitation sits in its box. The zari border is the one ornament - it
+   is the thing a visitor remembers - so everything around it stays quiet.
+
+     1  tokens               8  zari border         15  footer
+     2  reset and base       9  buttons             16  floating WhatsApp
+     3  accessibility, icons 10  collections, cards 17  preview modal
+     4  opening sequence    11  the phone           18  cursor
+     5  sale bar            12  custom build        19  reveals
+     6  header              13  how it works        20  reduced motion
+     7  hero                14  questions
+
+   Responsive rules sit with the component they change, not in a separate
+   layer, so a component can be read top to bottom in one place.
+   ========================================================================= */
+
+/* =========================================================================
+   1  TOKENS
+   ========================================================================= */
+
+:root {
+  /* ---- silk: the dark grounds (the logo's maroon) ---- */
+  --silk:       #4A1520;
+  --silk-2:     #62202C;   /* a lifted pool of light within the silk */
+  --silk-deep:  #2C0B12;   /* the fold: hem, sale bar, shadow */
+  --silk-night: #17060A;   /* the room behind the preview */
+
+  /* ---- zari: the gold thread ---- */
+  --zari:       #D8B46E;   /* gold on silk - 8.1:1 on --silk */
+  --zari-lt:    #F0DDB2;
+  --zari-dk:    #A47E3E;
+  --gold-ink:   #86601F;   /* gold set as type on paper - 4.9:1 */
+
+  /* ---- paper: the card stock ---- */
+  --paper:      #F8F2EA;
+  --paper-2:    #F0E6D9;   /* a deeper sheet, for a band */
+  --paper-hi:   #FDFAF5;   /* a raised sheet */
+
+  /* ---- ink ---- */
+  --ink:        #2A1216;   /* maroon-black, so the type belongs to the silk */
+  --ink-2:      #5A4146;   /* 8.3:1 on paper */
+  --ink-3:      #7A6368;   /* 4.9:1 on paper - struck prices, counts */
+  --line:        rgba(74, 21, 32, 0.16);
+  --line-strong: rgba(74, 21, 32, 0.34);
+  --line-soft:   rgba(74, 21, 32, 0.08);
+
+  /* ---- type and lines on silk ---- */
+  --on-silk:    #F7EEE3;
+  --on-silk-2:  rgba(247, 238, 227, 0.8);
+  --on-silk-3:  rgba(247, 238, 227, 0.64);   /* 5.4:1 on --silk */
+  --line-silk:  rgba(216, 180, 110, 0.3);
+
+  /* Gold that behaves like foil rather than paint: a dark edge, a bright
+     catch and a soft return, wide enough to slide light across. */
+  --foil: linear-gradient(100deg,
+    #A47E3E 0%, #D8B46E 20%, #F6E6BF 34%, #D2AC62 50%,
+    #A47E3E 66%, #E7CD93 84%, #B58E4A 100%);
+  /* the same metal, dark enough to read as type on paper */
+  --foil-ink: linear-gradient(100deg,
+    #6B4A17 0%, #8C6526 30%, #B38A45 46%, #8C6526 60%, #6B4A17 80%, #8C6526 100%);
+
+  /* one restrained accent per collection, overridden in section 10 */
+  --accent: var(--gold-ink);
+
+  /* ---- type ----
+     Cormorant Garamond is the face of the RagaHru wordmark itself.
+     Anek Latin (Ek Type, Mumbai) carries the text: it draws a true rupee
+     sign, and it has a Kannada sibling for the day the site speaks it. */
+  --serif: "Cormorant Garamond", "Cormorant", Georgia, "Times New Roman", serif;
+  --sans:  "Anek Latin", "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+
+  --t-xs:   0.8125rem;   /* 13 - meta, badges; the floor */
+  --t-sm:   0.875rem;    /* 14 - buttons, nav, captions */
+  --t-base: 1rem;        /* 16 - body */
+  --t-md:   1.125rem;    /* 18 - lead */
+  --t-h3:   clamp(1.5rem, 1.25rem + 0.8vw, 1.875rem);
+  --t-h2:   clamp(2.1rem, 1.4rem + 2.6vw, 3.75rem);
+  --t-h1:   clamp(2.9rem, 1.6rem + 5.2vw, 6rem);
+
+  /* ---- rhythm ---- */
+  --wrap:     1320px;
+  --gutter:   clamp(20px, 5vw, 72px);
+  --section:  clamp(72px, 11vh, 132px);
+  --phone-h:  320px;
+  --header-h: 76px;
+  --promo-h:  40px;
+  --zari-h:   40px;
+
+  /* ---- motion ---- */
+  --ease:       cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-soft:  cubic-bezier(0.33, 0.75, 0.25, 1);
+  --ease-cine:  cubic-bezier(0.16, 0.84, 0.28, 1);
+  --ease-hero:  cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-luxe:  cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* the sale bar is permanent while it is in the page; delete its block from
+   index.html to end the sale, and the space it held above the header goes
+   with it */
+:root:not(:has(.promo)) { --promo-h: 0px; }
+
+@property --luxe-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+/* =========================================================================
+   2  RESET AND BASE
+   ========================================================================= */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--header-h) + var(--promo-h) + 24px);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(74, 21, 32, 0.45) var(--paper-2);
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: var(--t-base);
+  line-height: 1.6;
+  font-weight: 400;
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* iOS and Android paint a translucent box over anything tappable. */
+a, button, [role="button"], summary, label,
+.card, .phone, .modal__close {
+  -webkit-tap-highlight-color: transparent;
+}
+
+h1, h2, h3, p, ul, ol, figure { margin: 0; padding: 0; }
+[hidden] { display: none !important; }
+ul, ol { list-style: none; }
+img, video { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+
+/* The page is drawn edge to edge (viewport-fit=cover); max() keeps the
+   normal gutter everywhere and only grows where a notch actually is. */
+.wrap {
+  width: 100%;
+  max-width: var(--wrap);
+  margin-inline: auto;
+  padding-left: max(var(--gutter), env(safe-area-inset-left, 0px));
+  padding-right: max(var(--gutter), env(safe-area-inset-right, 0px));
+}
+
+/* the faintest paper grain - warmth, not texture */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  pointer-events: none;
+  opacity: 0.4;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
+}
+
+/* Safari before 16 has no overflow: clip; the hero's glows are wider than
+   their boxes and would push the page sideways without this. */
+@supports not (overflow: clip) {
+  html { overflow-x: hidden; }
+  body { overflow-x: hidden; }
+}
+
+::selection {
+  background: rgba(216, 180, 110, 0.42);
+  color: var(--ink);
+}
+
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: var(--paper-2); }
+::-webkit-scrollbar-thumb {
+  background: rgba(74, 21, 32, 0.4);
+  border: 3px solid var(--paper-2);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(74, 21, 32, 0.62); }
+
+/* smooth scrolling (js/vendor/lenis.min.js) owns the easing, so the
+   browser's own smooth behaviour stands down */
+html.lenis,
+html.lenis body { height: auto; }
+html.lenis { scroll-behavior: auto; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: clip; }
+
+body.is-locked { overflow: hidden; }
+
+/* ---- casual copy protection ---- */
+
+body {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.selectable {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  user-select: text;
+}
+
+img, video {
+  -webkit-user-drag: none;
+  pointer-events: none;
+}
+
+.phone__video::-webkit-media-controls { display: none !important; }
+
+/* =========================================================================
+   3  ACCESSIBILITY AND ICONS
+   ========================================================================= */
+
+.skip-link {
+  position: absolute;
+  left: 50%;
+  top: -100px;
+  transform: translateX(-50%);
+  z-index: 999;
+  padding: 12px 22px;
+  background: var(--silk);
+  color: var(--on-silk);
+  font-size: var(--t-sm);
+  font-weight: 500;
+  transition: top 0.25s var(--ease);
+}
+.skip-link:focus-visible { top: 12px; }
+
+/* The ring follows the ground it sits on: gold ink on paper, zari on silk.
+   Dark containers set --focus; collections set --accent. */
+:focus-visible {
+  outline: 2px solid var(--focus, var(--accent));
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* inline SVG, sized in em so it tracks the text beside it */
+.ico {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  fill: currentColor;
+  flex: none;
+  vertical-align: middle;
+  pointer-events: none;
+}
+
+/* =========================================================================
+   4  OPENING SEQUENCE
+   The page paints, then the wordmark, headline, navigation and phones
+   arrive in order. It is over in about a second, and it is the one
+   orchestrated moment on the page.
+   ========================================================================= */
+
+/* the ground fades in with no JavaScript involved, so a failed script can
+   never leave the page blank */
+.veil {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: var(--silk);
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  animation: veil-out 0.62s var(--ease) backwards;
+}
+@keyframes veil-out {
+  from { opacity: 1; visibility: visible; }
+  to   { opacity: 0; visibility: hidden; }
+}
+
+/* staged items are hidden only while the boot class (set by script) exists */
+html.is-booting .boot {
+  opacity: 0;
+  transform: translateY(14px);
+}
+html.is-ready .boot {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.95s var(--ease-soft) var(--boot-delay, 0ms),
+    transform 1.05s var(--ease-soft) var(--boot-delay, 0ms);
+}
+
+/* =========================================================================
+   5  SALE BAR
+   A slim band above the header that stays in view while visitors browse.
+   ========================================================================= */
+
+.promo {
+  --focus: var(--zari);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 51;
+  display: flex;
+  align-items: center;
+  height: var(--promo-h);
+  overflow: hidden;
+  color: var(--on-silk-2);
+  background: var(--silk-deep);
+  border-bottom: 1px solid var(--line-silk);
+  font-size: var(--t-xs);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.promo__inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(14px, 2.2vw, 30px);
+  width: 100%;
+  padding-inline: 20px;
+}
+
+.promo__text {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+}
+
+.promo__label {
+  font-weight: 600;
+  color: var(--zari);
+}
+
+/* a small zari lozenge between the facts, the border's own motif */
+.promo__sep {
+  width: 5px;
+  height: 5px;
+  flex: none;
+  border: 1px solid rgba(216, 180, 110, 0.7);
+  transform: rotate(45deg);
+}
+
+.promo__offer,
+.promo__save {
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+}
+
+.promo__now {
+  font-size: 1.15em;
+  font-weight: 600;
+  color: var(--on-silk);
+}
+.promo__was {
+  margin-left: 6px;
+  color: var(--on-silk-3);
+  text-decoration-thickness: 1px;
+}
+.promo__save { color: var(--zari-lt); }
+
+.promo__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  color: var(--on-silk);
+  line-height: 1;
+  text-decoration: underline;
+  text-decoration-color: rgba(216, 180, 110, 0.5);
+  text-underline-offset: 4px;
+  transition: text-decoration-color 0.4s var(--ease);
+}
+.promo__link svg {
+  width: 16px;
+  height: auto;
+  transition: transform 0.5s var(--ease-luxe);
+}
+.promo__link:hover,
+.promo__link:focus-visible { text-decoration-color: var(--zari); }
+.promo__link:hover svg,
+.promo__link:focus-visible svg { transform: translateX(4px); }
+
+/* everything below the bar moves down by its height */
+main { padding-top: var(--promo-h); }
+
+@media (max-width: 760px) {
+  .promo__what { display: none; }
+}
+
+@media (max-width: 600px) {
+  :root { --promo-h: 36px; }
+
+  .promo__inner { padding-inline: 14px; }
+  .promo__text { gap: 9px; }
+  .promo__link { display: none; }
+}
+
+@media (max-width: 375px) {
+  .promo__text { gap: 7px; }
+  .promo { font-size: 0.75rem; }
+}
+
+/* =========================================================================
+   6  HEADER
+   Transparent over the silk, frosted paper once the designs are beneath.
+   Paper is the default: if scripting never runs, the bar is still legible.
+   ========================================================================= */
+
+.site-header {
+  position: fixed;
+  top: var(--promo-h);
+  left: 0;
+  right: 0;
+  z-index: 50;
+  color: var(--ink);
+  background: var(--paper);
+  transition: background 0.5s var(--ease), color 0.5s var(--ease),
+              box-shadow 0.5s var(--ease);
+}
+
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .site-header:not(.is-over-masthead) {
+    background: rgba(248, 242, 234, 0.86);
+    -webkit-backdrop-filter: saturate(1.3) blur(14px);
+    backdrop-filter: saturate(1.3) blur(14px);
+  }
+}
+
+.site-header::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--line-soft);
+  transition: background 0.5s var(--ease);
+}
+
+/* Over the masthead the bar is clear at rest. Once the page moves, this
+   scrim rides under it so the headline passing beneath is pushed back into
+   the silk and the navigation stays legible. */
+.site-header::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: calc(100% + 42px);
+  z-index: -1;
+  opacity: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg,
+    rgba(44, 11, 18, 0.97) 0%,
+    rgba(44, 11, 18, 0.94) 45%,
+    rgba(44, 11, 18, 0.86) 63%,
+    rgba(44, 11, 18, 0.5) 78%,
+    rgba(44, 11, 18, 0.16) 90%,
+    rgba(44, 11, 18, 0) 100%);
+  transition: opacity 0.45s var(--ease);
+}
+.site-header.is-over-masthead.is-scrolled::before { opacity: 1; }
+
+/* decided before the first paint, so nothing fades on load */
+html.is-booting .site-header,
+html.is-booting .site-header::before,
+html.is-booting .site-header::after,
+html.is-booting .site-header .site-nav__link { transition: none; }
+
+.site-header.is-stuck { box-shadow: 0 14px 30px -28px rgba(44, 11, 18, 0.6); }
+
+.site-header.is-over-masthead {
+  --focus: var(--zari);
+  color: var(--on-silk);
+  background: transparent;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.site-header.is-over-masthead::after { background: rgba(247, 238, 227, 0.16); }
+
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  min-height: var(--header-h);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  gap: 10px;
+  font-family: var(--serif);
+  font-size: clamp(22px, 1.9vw, 27px);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  white-space: nowrap;
+  /* not transitioned: an inherited colour transition can be left pinned,
+     which would put a dark wordmark on the dark masthead */
+}
+.brand:hover,
+.brand:focus-visible { color: var(--gold-ink); }
+.site-header.is-over-masthead .brand:hover,
+.site-header.is-over-masthead .brand:focus-visible { color: var(--zari); }
+
+/* the bar wears the gold monogram beside the name; the full lockup would
+   be unreadable at this height */
+.brand__logo {
+  display: none;
+  height: clamp(30px, 3vw, 40px);
+  width: auto;
+}
+html.has-mark .brand__logo { display: block; }
+
+.site-nav { margin-left: auto; }
+
+.site-nav__list {
+  display: flex;
+  align-items: center;
+  gap: clamp(18px, 2.6vw, 38px);
+}
+
+.site-nav__link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 8px 0;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--ink-2);
+  transition: color 0.4s var(--ease);
+}
+.site-nav__link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(50% - 0.95em);
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.5s var(--ease);
+}
+.site-nav__link:hover,
+.site-nav__link:focus-visible,
+.site-nav__link.is-active { color: var(--ink); }
+.site-nav__link:hover::after,
+.site-nav__link:focus-visible::after,
+.site-nav__link.is-active::after { transform: scaleX(1); }
+
+.site-header.is-over-masthead .site-nav__link { color: var(--on-silk-2); }
+.site-header.is-over-masthead .site-nav__link::after { background: var(--zari); }
+.site-header.is-over-masthead .site-nav__link:hover,
+.site-header.is-over-masthead .site-nav__link:focus-visible { color: var(--on-silk); }
+
+/* an enquiry is one click from anywhere on a wide screen */
+.site-header__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 18px;
+  margin-left: clamp(8px, 1.2vw, 16px);
+  font-size: var(--t-sm);
+  font-weight: 500;
+  color: var(--on-silk);
+  background: var(--silk);
+  border: 1px solid var(--silk);
+  border-radius: 2px;
+  transition: background 0.4s var(--ease), color 0.4s var(--ease), border-color 0.4s var(--ease);
+}
+.site-header__cta .ico { font-size: 1.1em; color: var(--zari); }
+.site-header__cta:hover,
+.site-header__cta:focus-visible { background: var(--silk-deep); border-color: var(--silk-deep); }
+
+.site-header.is-over-masthead .site-header__cta {
+  color: var(--on-silk);
+  background: rgba(247, 238, 227, 0.06);
+  border-color: rgba(216, 180, 110, 0.55);
+}
+.site-header.is-over-masthead .site-header__cta:hover,
+.site-header.is-over-masthead .site-header__cta:focus-visible {
+  color: var(--silk-deep);
+  background: var(--zari);
+  border-color: var(--zari);
+}
+.site-header.is-over-masthead .site-header__cta:hover .ico,
+.site-header.is-over-masthead .site-header__cta:focus-visible .ico { color: var(--silk-deep); }
+
+/* reading progress: a gold thread along the bottom of the bar */
+.scroll-progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(90deg, var(--zari-dk), var(--zari) 45%, var(--zari-lt));
+  transform: scaleX(0);
+  transform-origin: left center;
+  will-change: transform;
+  transition: opacity 0.5s var(--ease);
+}
+.site-header.is-over-masthead .scroll-progress { opacity: 0; }
+
+@media (max-width: 899px) {
+  :root { --header-h: 66px; }
+  .site-header__cta { display: none; }
+  .brand { font-size: 22px; }
+  .site-nav__link { font-size: var(--t-sm); }
+}
+
+@media (max-width: 430px) {
+  .site-nav__list { gap: 16px; }
+  .brand { font-size: 20px; gap: 8px; }
+  .brand__logo { height: 30px; }
+}
+
+@media (max-width: 375px) {
+  :root { --header-h: 62px; }
+  .site-header__inner { gap: 12px; }
+  .brand { font-size: 19px; }
+  .brand__logo { height: 28px; }
+  .site-nav__list { gap: 13px; }
+  .site-nav__link { font-size: var(--t-xs); }
+}
+
+@media (max-width: 340px) {
+  .brand__logo { display: none !important; }
+  .site-nav__list { gap: 11px; }
+}
+
+/* =========================================================================
+   7  HERO
+   Layers:  0 the film or the poster rail   .hero__bg / .hero__rail
+            1 the silk ground               .hero__tint
+            2 a warm gold bloom             .hero::before
+            3 the copy and the phones       .hero__inner
+            4 the fold into the hem         .hero::after
+   ========================================================================= */
+
+.hero {
+  --focus: var(--zari);
+  position: relative;
+  overflow: clip;
+  isolation: isolate;
+  padding-top: calc(var(--header-h) + clamp(40px, 7vh, 88px));
+  padding-bottom: clamp(56px, 9vh, 100px);
+  color: var(--on-silk);
+  background-color: var(--silk);
+}
+
+/* the silk folds a little darker as it reaches the hem */
+.hero::after {
+  content: "";
+  position: absolute;
+  z-index: 4;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 38%;
+  pointer-events: none;
+  /* light enough that the bottom row of posters still reads through it */
+  background: linear-gradient(180deg, rgba(44, 11, 18, 0), rgba(44, 11, 18, 0.3));
+}
+
+.hero__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1.2s var(--ease);
+}
+html.has-hero-video .hero__bg { opacity: 1; }
+
+/* a phone recording carries its status bar along the top; on a narrow
+   screen the frame is anchored low and grown so that strip is clipped */
+@media (max-width: 480px) {
+  .hero__bg {
+    object-position: 50% 100%;
+    transform: scale(1.14);
+    transform-origin: 50% 100%;
+  }
+}
+
+/* ---- the poster rail ----
+   A single unbroken row of invitations drifting behind the headline. The
+   list is laid down twice and slid by exactly one pass, so the loop never
+   seams; js/app.js measures the distance and the duration. */
+.hero__rail {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.4s var(--ease);
+}
+html.has-hero-rail .hero__rail { opacity: 1; }
+
+.hero__rail-track {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  width: max-content;
+  animation: rail-drift var(--rail-seconds, 120s) linear infinite;
+  animation-play-state: paused;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+}
+html.has-hero-rail .hero__rail-track { animation-play-state: running; }
+
+.hero__rail-poster {
+  flex: none;
+  height: clamp(260px, 44vh, 440px);
+  width: auto;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  margin-right: clamp(12px, 1.5vw, 24px);
+  border-radius: 3px;
+  filter: saturate(0.85);
+  /* each poster dissolves at top and bottom: light in the room, not cards */
+  -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, #000 24%, #000 52%, rgba(0, 0, 0, 0) 94%);
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, #000 24%, #000 52%, rgba(0, 0, 0, 0) 94%);
+}
+
+@keyframes rail-drift {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(calc(-1 * var(--rail-shift, 50%)), 0, 0); }
+}
+
+.hero__rail--back { opacity: 0; }
+html.has-hero-rail .hero__rail--back { opacity: 0.38; }
+.hero__rail--back .hero__rail-track {
+  animation-name: rail-drift-back;
+  align-items: flex-start;
+}
+.hero__rail--back .hero__rail-poster {
+  height: clamp(150px, 26vh, 260px);
+  margin-right: clamp(10px, 1.2vw, 18px);
+  filter: saturate(0.7) blur(1px);
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 40%, rgba(0, 0, 0, 0) 100%);
+  mask-image: linear-gradient(180deg, #000 0%, #000 40%, rgba(0, 0, 0, 0) 100%);
+}
+@keyframes rail-drift-back {
+  from { transform: translate3d(calc(-1 * var(--rail-shift, 50%)), 0, 0); }
+  to   { transform: translate3d(0, 0, 0); }
+}
+
+/* The third row runs along the foot of the masthead: anchored to the
+   bottom, fading upward into the large row, and rolling to the right - so
+   the large row between the two small ones, rolling left, passes both.
+   It is set at the large row's strength rather than the top row's, since
+   the fold into the hem already lies over it. */
+.hero__rail--low { opacity: 0; }
+html.has-hero-rail .hero__rail--low { opacity: 0.9; }
+.hero__rail--low .hero__rail-track {
+  animation-name: rail-drift-back;
+  align-items: flex-end;
+}
+.hero__rail--low .hero__rail-poster {
+  height: clamp(150px, 26vh, 260px);
+  margin-right: clamp(10px, 1.2vw, 18px);
+  filter: saturate(0.8);
+  -webkit-mask-image: linear-gradient(0deg, #000 0%, #000 55%, rgba(0, 0, 0, 0) 100%);
+  mask-image: linear-gradient(0deg, #000 0%, #000 55%, rgba(0, 0, 0, 0) 100%);
+}
+
+/* ---- the silk ground, laid OVER the rail or film ----
+   so the headline's contrast never depends on what moves behind it */
+.hero__tint {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-image:
+    radial-gradient(80% 70% at 72% 28%, rgba(98, 32, 44, 0.7), rgba(98, 32, 44, 0) 70%),
+    radial-gradient(70% 60% at 12% 92%, rgba(44, 11, 18, 0.8), rgba(44, 11, 18, 0) 70%);
+}
+html.has-hero-video .hero__tint {
+  background-color: rgba(74, 21, 32, 0.8);
+  -webkit-backdrop-filter: saturate(0.8);
+  backdrop-filter: saturate(0.8);
+}
+html.has-hero-rail .hero__tint {
+  background-color: rgba(74, 21, 32, 0.87);
+  -webkit-backdrop-filter: saturate(0.6) blur(1.5px);
+  backdrop-filter: saturate(0.6) blur(1.5px);
+}
+/* a quiet vignette holds the eye in the middle */
+.hero__tint::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(130% 95% at 50% 40%, rgba(23, 6, 10, 0) 55%, rgba(23, 6, 10, 0.5) 100%);
+}
+
+/* one warm bloom of gold light behind the phones. The radii stay under half
+   the box so the gradient is gone before any edge can clip it. */
+.hero::before {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  top: 4%;
+  left: 62%;
+  width: min(1100px, 120vw);
+  height: min(560px, 60vh);
+  transform: translateX(-50%);
+  background: radial-gradient(42% 42% at 50% 50%,
+    rgba(216, 180, 110, 0.17), rgba(216, 180, 110, 0) 100%);
+  pointer-events: none;
+}
+
+/* ---- two zones: copy left, the phone composition right ---- */
+
+.hero__inner {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: minmax(0, 54fr) minmax(0, 46fr);
+  align-items: center;
+  gap: clamp(26px, 3.6vw, 64px);
+  perspective: 1600px;
+}
+.hero--solo .hero__inner { grid-template-columns: minmax(0, 1fr); }
+
+/* it eases away as the page scrolls; js/luxe.js writes --sp (0..1) */
+.hero__copy {
+  text-align: left;
+  translate: 0 calc(var(--sp, 0) * 70px);
+  opacity: calc(1 - var(--sp, 0) * 1.15);
+}
+
+.hero__tagline {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(1.15rem, 1rem + 0.5vw, 1.45rem);
+  line-height: 1.3;
+  color: var(--zari-lt);
+}
+
+/* the champagne line that draws itself open - the RagaHru signature */
+.signature {
+  display: block;
+  width: clamp(56px, 7vw, 96px);
+  height: 1px;
+  flex: none;
+  opacity: 0;
+  transform: scaleX(0);
+  transform-origin: left center;
+  background: linear-gradient(90deg, var(--zari-dk), var(--zari) 40%, var(--zari-lt) 70%, var(--zari));
+}
+.signature--hero {
+  width: clamp(56px, 6vw, 88px);
+  margin: clamp(16px, 2.6vh, 24px) 0 clamp(18px, 3vh, 28px);
+}
+html.is-ready .signature--hero {
+  opacity: 1;
+  transform: scaleX(1);
+  transition: transform 620ms var(--ease-soft) 300ms, opacity 380ms var(--ease) 300ms;
+}
+
+.hero__title {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: var(--t-h1);
+  line-height: 0.98;
+  letter-spacing: -0.025em;
+  color: var(--on-silk);
+}
+.hero__line { display: block; }
+
+.hero__sub {
+  margin-top: clamp(20px, 3.2vh, 30px);
+  max-width: 40ch;
+  font-size: var(--t-md);
+  line-height: 1.6;
+  color: var(--on-silk-2);
+  text-wrap: pretty;
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: clamp(26px, 4vh, 38px);
+}
+
+.hero__facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 26px;
+  margin-top: clamp(20px, 3vh, 28px);
+  font-size: var(--t-sm);
+  color: var(--on-silk-3);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+.hero__facts li {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+/* the zari lozenge again, as the bullet */
+.hero__facts li::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  flex: none;
+  border: 1px solid var(--zari);
+  transform: rotate(45deg);
+}
+.hero__facts strong { font-weight: 600; color: var(--on-silk); }
+
+/* ---- the stage: three phones as one composition ---- */
+
+.hero__stage {
+  --hero-phone-h: clamp(240px, 24vw, 352px);
+  position: relative;
+  height: calc(var(--hero-phone-h) * 1.3);
+  /* drifts with the pointer; js/luxe.js writes --mx / --my (-1..1) */
+  translate:
+    calc(var(--mx, 0) * 16px)
+    calc(var(--my, 0) * 10px + var(--sp, 0) * -46px);
+  rotate: y calc(var(--mx, 0) * 5deg);
+}
+
+/* ambient light pooled behind the glass */
+.hero__stage::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 175%;
+  height: 140%;
+  transform: translate(-50%, -50%);
+  background:
+    radial-gradient(30% 28% at 50% 44%, rgba(240, 221, 178, 0.2), rgba(240, 221, 178, 0) 100%),
+    radial-gradient(44% 40% at 52% 58%, rgba(164, 126, 62, 0.2), rgba(164, 126, 62, 0) 100%);
+  pointer-events: none;
+}
+
+/* Each position writes a COMPLETE transform. Built from custom properties
+   instead, the declaration would not change between states and a promoted
+   layer can keep a stale matrix. */
+.hero__stage .hero__phone {
+  --phone-h: var(--hero-phone-h);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin: 0;
+  transform: translate(-50%, -50%) scale(1);
+  transition:
+    transform 700ms var(--ease-hero),
+    opacity 700ms var(--ease-hero),
+    filter 700ms var(--ease-hero);
+}
+.hero__stage.is-resizing .hero__phone { transition: none; }
+
+.hero__stage .hero__phone[data-pos="center"] {
+  transform: translate(-50%, -50%) translate3d(0, 0, 0) scale(1);
+  z-index: 3;
+  opacity: 1;
+  filter: none;
+  translate: calc(var(--mx, 0) * 10px) calc(var(--my, 0) * 6px);
+}
+.hero__stage .hero__phone[data-pos="left"],
+.hero__stage .hero__phone[data-pos="right"] {
+  z-index: 1;
+  opacity: 0.92;
+  filter: brightness(0.78);
+  translate: calc(var(--mx, 0) * -6px) calc(var(--my, 0) * -4px);
+}
+.hero__stage .hero__phone[data-pos="left"] {
+  transform: translate(-50%, -50%) translate3d(calc(-1 * clamp(78px, 9.4vw, 132px)), 14px, 0) scale(0.78);
+}
+.hero__stage .hero__phone[data-pos="right"] {
+  transform: translate(-50%, -50%) translate3d(clamp(78px, 9.4vw, 132px), 14px, 0) scale(0.78);
+}
+
+/* a near-black handset on a deep ground needs its edge drawn for it */
+.hero__stage .hero__phone .phone__body {
+  box-shadow:
+    0 0 0 0.5px rgba(255, 255, 255, 0.16),
+    0 38px 58px -34px rgba(0, 0, 0, 0.85);
+}
+.hero__stage .hero__phone[data-pos="center"] .phone__body {
+  box-shadow:
+    0 0 0 0.5px rgba(216, 180, 110, 0.5),
+    0 0 40px -8px rgba(216, 180, 110, 0.2),
+    0 56px 76px -38px rgba(0, 0, 0, 0.94);
+}
+.hero__stage .hero__phone .phone__shadow {
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.58), rgba(0, 0, 0, 0) 70%);
+}
+.hero__stage .hero__phone .watermark { font-size: 6px; letter-spacing: 0.36em; }
+
+/* the centre holds nearly still; the two behind it breathe */
+@keyframes drift-left {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(-1.4deg); }
+  50%      { transform: translate3d(0, -4px, 0) rotate(-1.4deg); }
+}
+@keyframes drift-right {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(1.4deg); }
+  50%      { transform: translate3d(0, 4px, 0) rotate(1.4deg); }
+}
+@keyframes drift-centre {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50%      { transform: translate3d(0, -3px, 0); }
+}
+.hero__stage .hero__phone[data-pos="left"] .phone__body { animation: drift-left 9s var(--ease-soft) infinite; }
+.hero__stage .hero__phone[data-pos="right"] .phone__body { animation: drift-right 10.5s var(--ease-soft) infinite; }
+.hero__stage .hero__phone[data-pos="center"] .phone__body { animation: drift-centre 12s var(--ease-soft) infinite; }
+
+/* the composition arrives from a little depth, just after the copy */
+html.is-booting .hero__stage {
+  opacity: 0;
+  transform: translateY(26px) scale(0.955);
+}
+html.is-ready .hero__stage {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 1.05s var(--ease-soft) var(--boot-delay, 0ms),
+    transform 1.2s var(--ease-soft) var(--boot-delay, 0ms);
+}
+
+/* ---- masked line reveal ----
+   Each headline line rises out of its own slot, the way a title card is
+   cut. js/luxe.js wraps the content in .line__i before the entrance. */
+.hero__line.is-masked,
+.mask-line.is-masked {
+  display: block;
+  overflow: hidden;
+  /* room for descenders and italic overhang, given back by the margin */
+  padding: 0 0.12em 0.14em 0;
+  margin: 0 -0.12em -0.14em 0;
+}
+.hero__line.is-masked .line__i,
+.mask-line.is-masked .line__i {
+  display: inline-block;
+  transform: translate3d(0, 112%, 0) rotate(2.5deg);
+  transform-origin: 0 100%;
+}
+html.is-booting .hero__line.is-masked.boot,
+html.is-ready .hero__line.is-masked.boot {
+  opacity: 1;
+  transform: none;
+}
+html.is-ready .hero__line.is-masked .line__i {
+  transform: none;
+  transition: transform 1.35s var(--ease-luxe) var(--boot-delay, 0ms);
+}
+.mask-line.is-masked.is-visible .line__i {
+  transform: none;
+  transition: transform 1.3s var(--ease-luxe) calc(var(--reveal-delay, 0ms) + 80ms);
+}
+
+/* ---- hero, responsive ---- */
+
+@media (max-width: 1200px) {
+  .hero__stage { --hero-phone-h: clamp(232px, 24.5vw, 312px); }
+  .hero__stage .hero__phone[data-pos="left"] {
+    transform: translate(-50%, -50%) translate3d(calc(-1 * clamp(74px, 9vw, 118px)), 14px, 0) scale(0.78);
+  }
+  .hero__stage .hero__phone[data-pos="right"] {
+    transform: translate(-50%, -50%) translate3d(clamp(74px, 9vw, 118px), 14px, 0) scale(0.78);
+  }
+}
+
+@media (max-width: 1024px) {
+  .hero__inner { gap: clamp(20px, 3vw, 40px); }
+  .hero__stage { --hero-phone-h: clamp(214px, 25vw, 276px); }
+  .hero__title { font-size: clamp(2.6rem, 6.4vw, 4.2rem); }
+  .hero__stage .hero__phone[data-pos="left"] {
+    transform: translate(-50%, -50%) translate3d(calc(-1 * clamp(64px, 8vw, 96px)), 14px, 0) scale(0.78);
+  }
+  .hero__stage .hero__phone[data-pos="right"] {
+    transform: translate(-50%, -50%) translate3d(clamp(64px, 8vw, 96px), 14px, 0) scale(0.78);
+  }
+}
+
+/* stacked: headline first, then the composition */
+@media (max-width: 899px) {
+  .hero__inner {
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(38px, 7vw, 62px);
+    justify-items: center;
+  }
+  .hero__copy { width: 100%; max-width: 36rem; }
+  .hero__stage {
+    width: 100%;
+    max-width: 30rem;
+    --hero-phone-h: clamp(238px, 40vw, 300px);
+    height: calc(var(--hero-phone-h) * 1.14);
+  }
+  .hero__title { font-size: clamp(2.9rem, 9vw, 4.4rem); }
+  .hero__stage .hero__phone[data-pos="left"] {
+    transform: translate(-50%, -50%) translate3d(calc(-1 * clamp(78px, 12vw, 116px)), 14px, 0) scale(0.78);
+  }
+  .hero__stage .hero__phone[data-pos="right"] {
+    transform: translate(-50%, -50%) translate3d(clamp(78px, 12vw, 116px), 14px, 0) scale(0.78);
+  }
+}
+
+/* A phone held upright is the primary screen: the showcase should stand
+   complete within the first screen, so the spacing tightens here. */
+@media (max-width: 600px) {
+  .hero {
+    padding-top: calc(var(--header-h) + 24px);
+    padding-bottom: 44px;
+  }
+  .hero__inner { gap: 30px; }
+  .signature--hero { width: 52px; margin: 12px 0 16px; }
+  .hero__tagline { font-size: 1.1rem; }
+  .hero__title { font-size: clamp(2.6rem, 12vw, 3.4rem); }
+  .hero__sub { margin-top: 16px; font-size: var(--t-base); max-width: 36ch; }
+  .hero__actions { margin-top: 22px; gap: 10px; }
+  .hero__actions .btn { flex: 1 1 auto; padding-inline: 18px; }
+  .hero__facts { margin-top: 18px; gap: 6px 20px; font-size: var(--t-xs); }
+
+  .hero__stage {
+    --hero-phone-h: clamp(190px, 42vw, 244px);
+    height: calc(var(--hero-phone-h) * 1.06);
+  }
+  .hero__stage .hero__phone[data-pos="left"] {
+    transform: translate(-50%, -50%) translate3d(calc(-1 * clamp(60px, 15vw, 92px)), 14px, 0) scale(0.74);
+  }
+  .hero__stage .hero__phone[data-pos="right"] {
+    transform: translate(-50%, -50%) translate3d(clamp(60px, 15vw, 92px), 14px, 0) scale(0.74);
+  }
+}
+
+@media (max-width: 430px) {
+  .hero__stage { --hero-phone-h: 232px; }
+  .hero__stage .hero__phone[data-pos="left"] {
+    transform: translate(-50%, -50%) translate3d(-76px, 14px, 0) scale(0.74);
+  }
+  .hero__stage .hero__phone[data-pos="right"] {
+    transform: translate(-50%, -50%) translate3d(76px, 14px, 0) scale(0.74);
+  }
+}
+
+@media (max-width: 375px) {
+  .hero__stage { --hero-phone-h: 216px; }
+  .hero__title { font-size: 2.55rem; }
+  .hero__stage .hero__phone[data-pos="left"] {
+    transform: translate(-50%, -50%) translate3d(-68px, 14px, 0) scale(0.74);
+  }
+  .hero__stage .hero__phone[data-pos="right"] {
+    transform: translate(-50%, -50%) translate3d(68px, 14px, 0) scale(0.74);
+  }
+}
+
+@media (max-width: 340px) {
+  .hero__stage { --hero-phone-h: 200px; }
+  .hero__title { font-size: 2.3rem; }
+  .hero__stage .hero__phone[data-pos="left"] {
+    transform: translate(-50%, -50%) translate3d(-60px, 14px, 0) scale(0.74);
+  }
+  .hero__stage .hero__phone[data-pos="right"] {
+    transform: translate(-50%, -50%) translate3d(60px, 14px, 0) scale(0.74);
+  }
+}
+
+/* a true 9:16 screen has least room of all */
+@media (max-width: 600px) and (max-height: 700px) {
+  .hero { padding-top: calc(var(--header-h) + 14px); }
+  .signature--hero { margin: 10px 0 12px; }
+  .hero__sub { margin-top: 12px; }
+}
+
+/* short landscape: the composition would dominate, so it steps back */
+@media (max-height: 620px) and (orientation: landscape) and (min-width: 700px) {
+  .hero__stage { --hero-phone-h: clamp(190px, 30vh, 240px); }
+}
+
+/* =========================================================================
+   8  THE ZARI BORDER
+   The woven gold hem of the silk. The pattern is a mask, and the foil is
+   what shows through it, so a slow light travels along the thread the way
+   it catches on real zari when the cloth moves.
+   ========================================================================= */
+
+.zari {
+  position: relative;
+  z-index: 2;
+  height: var(--zari-h);
+  background: var(--silk-deep);
+  overflow: hidden;
+  /* the hem lies over the paper and casts the faintest shadow on it */
+  box-shadow: 0 14px 26px -18px rgba(44, 11, 18, 0.6);
+}
+
+.zari::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 24px;
+  margin-top: -12px;
+  background: var(--foil);
+  background-size: 300% 100%;
+  background-position: 0% 50%;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='24' viewBox='0 0 32 24'%3E%3Cg fill='%23000'%3E%3Crect y='0.6' width='32' height='1.3'/%3E%3Crect y='3.7' width='32' height='0.6'/%3E%3Crect y='19.7' width='32' height='0.6'/%3E%3Crect y='22.1' width='32' height='1.3'/%3E%3Cpath d='M16 10.2 17.8 12 16 13.8 14.2 12z'/%3E%3Ccircle cx='0' cy='12' r='1.5'/%3E%3Ccircle cx='32' cy='12' r='1.5'/%3E%3C/g%3E%3Cpath d='M16 6.6 21.4 12 16 17.4 10.6 12z' fill='none' stroke='%23000' stroke-width='1.1'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='24' viewBox='0 0 32 24'%3E%3Cg fill='%23000'%3E%3Crect y='0.6' width='32' height='1.3'/%3E%3Crect y='3.7' width='32' height='0.6'/%3E%3Crect y='19.7' width='32' height='0.6'/%3E%3Crect y='22.1' width='32' height='1.3'/%3E%3Cpath d='M16 10.2 17.8 12 16 13.8 14.2 12z'/%3E%3Ccircle cx='0' cy='12' r='1.5'/%3E%3Ccircle cx='32' cy='12' r='1.5'/%3E%3C/g%3E%3Cpath d='M16 6.6 21.4 12 16 17.4 10.6 12z' fill='none' stroke='%23000' stroke-width='1.1'/%3E%3C/svg%3E");
+  -webkit-mask-size: 32px 24px;
+  mask-size: 32px 24px;
+  -webkit-mask-repeat: repeat-x;
+  mask-repeat: repeat-x;
+  -webkit-mask-position: center 0;
+  mask-position: center 0;
+  animation: zari-catch 16s var(--ease-inout) infinite alternate;
+}
+
+@keyframes zari-catch {
+  from { background-position: 0% 50%; }
+  to   { background-position: 100% 50%; }
+}
+
+/* the footer's border sits at the top of the silk, facing the paper above */
+.zari--footer { box-shadow: 0 -14px 26px -18px rgba(44, 11, 18, 0.45); }
+
+@media (max-width: 600px) {
+  :root { --zari-h: 34px; }
+}
+
+/* =========================================================================
+   9  BUTTONS
+   One shape for every button: a firm rectangle with a hair of radius, the
+   way a card is trimmed. The fill wipes up on hover, so the change reads
+   as a response to the hand rather than a colour swap.
+   ========================================================================= */
+
+.btn {
+  --btn-fg: var(--ink);
+  --btn-bg: transparent;
+  --btn-bd: var(--line-strong);
+  --btn-fill: var(--silk);
+  --btn-fg-on: var(--on-silk);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 50px;
+  padding: 0 26px;
+  font-family: var(--sans);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0.005em;
+  text-align: center;
+  color: var(--btn-fg);
+  background: var(--btn-bg);
+  border: 1px solid var(--btn-bd);
+  border-radius: 2px;
+  overflow: hidden;
+  isolation: isolate;
+  transition: color 0.5s var(--ease), border-color 0.5s var(--ease),
+              transform 0.4s var(--ease), box-shadow 0.4s var(--ease);
+}
+
+.btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--btn-fill);
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 0.55s var(--ease-soft);
+}
+
+.btn .ico { font-size: 1.15em; }
+
+.btn:hover,
+.btn:focus-visible {
+  color: var(--btn-fg-on);
+  border-color: var(--btn-fill);
+  transform: translateY(-2px);
+  box-shadow: 0 16px 28px -20px rgba(44, 11, 18, 0.6);
+}
+.btn:hover::before,
+.btn:focus-visible::before { transform: scaleY(1); }
+
+/* maroon on paper - the main action */
+.btn--solid {
+  --btn-fg: var(--on-silk);
+  --btn-bg: var(--silk);
+  --btn-bd: var(--silk);
+  --btn-fill: var(--silk-deep);
+  --btn-fg-on: var(--on-silk);
+}
+.btn--solid .ico { color: var(--zari); }
+
+/* gold on silk - the main action on a dark ground */
+.btn--zari {
+  --btn-fg: var(--silk-deep);
+  --btn-bg: var(--zari);
+  --btn-bd: var(--zari);
+  --btn-fill: var(--zari-lt);
+  --btn-fg-on: var(--silk-deep);
+  font-weight: 600;
+}
+
+/* outline on silk - the second action on a dark ground */
+.btn--ghost {
+  --btn-fg: var(--on-silk);
+  --btn-bd: rgba(247, 238, 227, 0.4);
+  --btn-fill: var(--on-silk);
+  --btn-fg-on: var(--silk);
+}
+.btn--ghost .ico { color: var(--zari); transition: color 0.5s var(--ease); }
+.btn--ghost:hover .ico,
+.btn--ghost:focus-visible .ico { color: var(--silk); }
+
+/* a single beam of light crosses a filled button as it is hovered */
+.btn--solid::after,
+.btn--zari::after {
+  content: "";
+  position: absolute;
+  top: -10%;
+  bottom: -10%;
+  left: -70%;
+  width: 45%;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(100deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 250, 238, 0.34) 50%,
+    rgba(255, 255, 255, 0) 100%);
+  transform: skewX(-18deg);
+  transition: left 1s var(--ease-luxe);
+}
+.btn--solid:hover::after,
+.btn--solid:focus-visible::after,
+.btn--zari:hover::after,
+.btn--zari:focus-visible::after { left: 130%; }
+
+/* ---- the secondary action: words and a mark, never another box ---- */
+
+.link-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  margin-top: 6px;
+  padding: 8px 10px;
+  font-size: var(--t-sm);
+  font-weight: 500;
+  color: var(--ink-2);
+  transition: color 0.4s var(--ease);
+}
+.link-cta span {
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+  padding-bottom: 2px;
+  transition: background-size 0.6s var(--ease-luxe);
+}
+.link-cta .ico {
+  font-size: 1.1em;
+  color: var(--accent);
+  transition: transform 0.45s var(--ease-hero);
+}
+.link-cta:hover,
+.link-cta:focus-visible { color: var(--ink); }
+.link-cta:hover span,
+.link-cta:focus-visible span { background-size: 100% 1px; }
+.link-cta:hover .ico,
+.link-cta:focus-visible .ico { transform: scale(1.14); }
+
+/* =========================================================================
+   10  COLLECTIONS AND CARDS
+   Every collection is set identically on the same paper: tone never
+   encodes religion. Each gets one small accent - an icon, a focus ring.
+   ========================================================================= */
+
+.collection {
+  position: relative;
+  padding-block: clamp(64px, 10vh, 120px);
+}
+.collection[data-accent="hindu"]     { --accent: #86601F; }   /* marigold gold */
+.collection[data-accent="christian"] { --accent: #8C4A55; }   /* antique rose */
+.collection[data-accent="islamic"]   { --accent: #3E6452; }   /* deep emerald */
+
+.collection + .collection { border-top: 1px solid var(--line-soft); }
+
+/* straight after the custom card the two sections' padding would stack
+   into a gap; the card's own shadow already separates them */
+.custom + .collections > .collection:first-child { padding-top: clamp(24px, 4vh, 48px); }
+
+.collection__head {
+  display: flex;
+  align-items: baseline;
+  gap: clamp(14px, 2vw, 26px);
+  margin-bottom: clamp(40px, 6.5vh, 76px);
+}
+
+/* in a heading the signature is a lozenge, the zari motif in miniature */
+.collection__head .signature {
+  align-self: center;
+  width: 9px;
+  height: 9px;
+  background: none;
+  border: 1px solid var(--accent);
+  transform: rotate(45deg) scale(0);
+  transform-origin: center;
+}
+.collection__head.is-visible .signature {
+  opacity: 1;
+  transform: rotate(45deg) scale(1);
+  transition: transform 700ms var(--ease-luxe) 80ms, opacity 400ms var(--ease) 80ms;
+}
+
+.collection__title {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: clamp(2rem, 1.3rem + 2.6vw, 3.75rem);
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+  white-space: nowrap;
+}
+
+.collection__rule {
+  flex: 1 1 auto;
+  align-self: center;
+  height: 1px;
+  background: linear-gradient(90deg, var(--line-strong), var(--line-soft));
+}
+
+.collection__count {
+  font-size: var(--t-sm);
+  color: var(--ink-3);
+  white-space: nowrap;
+  font-variant-numeric: lining-nums;
+}
+
+/* the heading is cut open left to right, and the rule after it draws out */
+.collection__head.reveal .collection__title { clip-path: inset(-10% 100% -20% 0); }
+.collection__head.reveal.is-visible .collection__title {
+  clip-path: inset(-10% -2% -20% 0);
+  transition: clip-path 1.4s var(--ease-luxe) 0.18s;
+}
+.collection__head.reveal .collection__rule {
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+.collection__head.reveal.is-visible .collection__rule {
+  transform: scaleX(1);
+  transition: transform 1.6s var(--ease-luxe) 0.45s;
+}
+.collection__head.reveal .collection__count { opacity: 0; }
+.collection__head.reveal.is-visible .collection__count {
+  opacity: 1;
+  transition: opacity 0.9s var(--ease) 0.9s;
+}
+
+.collections__empty {
+  padding-block: 110px;
+  text-align: center;
+  color: var(--ink-2);
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.5rem;
+}
+
+/* ---- the grid ---- */
+
+.grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(52px, 6vw, 88px) clamp(24px, 2.8vw, 46px);
+}
+/* a short collection centres itself, so one design reads as a feature */
+.grid[data-count="1"] { grid-template-columns: minmax(0, 300px); justify-content: center; }
+.grid[data-count="2"] { grid-template-columns: repeat(2, minmax(0, 300px)); justify-content: center; }
+.grid[data-count="3"] { grid-template-columns: repeat(3, minmax(0, 300px)); justify-content: center; }
+
+/* ---- the card: no container, the phone carries the composition ---- */
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  text-align: center;
+  padding-bottom: clamp(30px, 3.4vw, 46px);
+}
+
+/* a rule in the gutter between designs, drawn to be seen */
+.card::before {
+  content: "";
+  position: absolute;
+  top: 2%;
+  bottom: 8%;
+  left: calc(-1 * clamp(12px, 1.4vw, 23px));
+  width: 1px;
+  background: linear-gradient(180deg,
+    rgba(74, 21, 32, 0) 0%,
+    rgba(74, 21, 32, 0.2) 10%,
+    rgba(74, 21, 32, 0.2) 90%,
+    rgba(74, 21, 32, 0) 100%);
+  pointer-events: none;
+}
+.card:nth-child(4n + 1)::before { display: none; }
+
+/* and a fine rule closing each design off from the next */
+.card::after {
+  content: "";
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg,
+    rgba(74, 21, 32, 0),
+    rgba(74, 21, 32, 0.12) 22%,
+    rgba(74, 21, 32, 0.12) 78%,
+    rgba(74, 21, 32, 0));
+}
+
+.card__trigger {
+  display: block;
+  padding: 0;
+  border-radius: 34px;
+  transition: transform 0.75s var(--ease-soft);
+}
+.card__trigger:hover,
+.card__trigger:focus-visible { transform: translateY(-5px) scale(1.012); }
+
+.card__name {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: clamp(24px, 2.6vw, 34px);
+  font-family: var(--serif);
+  font-size: var(--t-h3);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: 0.04em;
+  /* Cormorant draws old-style figures by default; a code is lining */
+  font-variant-numeric: lining-nums;
+  font-feature-settings: "lnum" 1;
+  transition: color 0.5s var(--ease);
+}
+.card:hover .card__name { color: color-mix(in srgb, var(--accent) 70%, var(--ink)); }
+
+/* driven by createdAt, never hand-flagged */
+.card__badge {
+  display: inline-block;
+  padding: 3px 9px 2px;
+  font-family: var(--sans);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: 0.02em;
+  color: var(--silk);
+  background: rgba(216, 180, 110, 0.26);
+  border: 1px solid rgba(164, 126, 62, 0.5);
+  border-radius: 999px;
+}
+
+.card__desc {
+  margin: 10px auto 0;
+  max-width: 30ch;
+  min-height: calc(2 * 1.55em);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--ink-2);
+  text-wrap: balance;
+}
+
+.features {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px 16px;
+  margin-top: 16px;
+}
+.features__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: var(--t-xs);
+  font-weight: 500;
+  color: var(--ink-2);
+}
+.features__item .ico { font-size: 1.05em; color: var(--accent); }
+.features__item--lang { color: var(--accent); font-weight: 600; }
+
+/* the foot is anchored to the bottom of the row, so descriptions of
+   different lengths never push prices out of line with their neighbours */
+.card__foot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin-top: auto;
+  padding-top: clamp(16px, 1.8vw, 22px);
+}
+
+.card__cta {
+  width: 100%;
+  max-width: 250px;
+  margin-top: 20px;
+}
+.card:hover .card__cta { border-color: rgba(74, 21, 32, 0.55); }
+
+/* ---- price ---- */
+
+/* every figure is set in the sans with lining, tabular numerals */
+.price,
+.price__deal {
+  font-family: var(--sans);
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+}
+
+.price {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 16px;
+}
+.price__from {
+  align-self: center;
+  font-size: var(--t-xs);
+  color: var(--ink-3);
+}
+.price__now {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.price__was {
+  font-size: var(--t-sm);
+  color: var(--ink-3);
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+
+/* the sale, named beside every reduced price */
+.price__deal {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  font-size: var(--t-xs);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.price__deal + .price { margin-top: 8px; }
+.price__deal-label {
+  padding: 3px 9px 2px;
+  font-size: 0.75rem;
+  color: var(--on-silk);
+  background: var(--silk);
+  border-radius: 999px;
+}
+.price__deal-save { color: var(--gold-ink); }
+
+/* ---- collections, responsive ---- */
+
+@media (min-width: 1441px) { :root { --phone-h: 340px; } }
+@media (max-width: 1280px) { :root { --phone-h: 308px; } }
+@media (max-width: 1200px) { :root { --phone-h: 296px; } }
+
+@media (max-width: 1024px) {
+  :root { --phone-h: 288px; }
+  .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .card:nth-child(4n + 1)::before { display: block; }
+  .card:nth-child(3n + 1)::before { display: none; }
+}
+
+@media (max-width: 899px) {
+  :root { --phone-h: 286px; }
+  .grid,
+  .grid[data-count="2"],
+  .grid[data-count="3"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grid[data-count="1"] { grid-template-columns: minmax(0, 280px); }
+  .card:nth-child(3n + 1)::before { display: block; }
+  .card:nth-child(2n + 1)::before { display: none; }
+  .collection__head { gap: 14px; }
+}
+
+@media (max-width: 768px) { :root { --phone-h: 272px; } }
+
+@media (max-width: 600px) {
+  :root { --phone-h: 246px; }
+  .collection { padding-block: 48px 52px; }
+  .collection__head { gap: 12px; margin-bottom: 30px; }
+  .collection__count { display: none; }
+  .grid { gap: 46px 18px; }
+
+  .card__name { margin-top: 20px; }
+  .card__desc { font-size: var(--t-sm); max-width: 26ch; }
+  .price__now { font-size: 1.3rem; }
+  .card__cta { margin-top: 16px; padding-inline: 12px; }
+}
+
+@media (max-width: 480px) { :root { --phone-h: 232px; } }
+
+/* Two per row all the way down: side by side, a collection is taken in at
+   a glance and a choice is made by looking, not by scrolling back. */
+@media (max-width: 430px) {
+  :root { --phone-h: 248px; }
+  .grid { gap: 42px 14px; }
+
+  .card { padding-bottom: 24px; }
+  .card__name { flex-wrap: wrap; justify-content: center; gap: 6px; margin-top: 16px; font-size: 1.35rem; }
+  .card__badge { padding: 2px 7px 1px; }
+  /* half the width holds half as much, so three lines are reserved */
+  .card__desc {
+    margin-top: 6px;
+    max-width: 22ch;
+    min-height: calc(3 * 1.5em);
+    font-size: var(--t-xs);
+    line-height: 1.5;
+  }
+  .card .features { margin-top: 10px; gap: 4px 10px; }
+  .card .features__item { font-size: 0.75rem; }
+  .card .price { margin-top: 8px; gap: 6px; }
+  .card .price__from { display: none; }
+  .card .price__now { font-size: 1.2rem; }
+  .card .price__was { font-size: var(--t-xs); }
+  .card .price__deal { gap: 6px; font-size: 0.75rem; }
+  .card__cta {
+    max-width: none;
+    min-height: 44px;
+    margin-top: 12px;
+    padding-inline: 8px;
+    font-size: var(--t-sm);
+  }
+  .card .link-cta { font-size: var(--t-xs); margin-top: 2px; }
+}
+
+@media (max-width: 375px) {
+  :root { --phone-h: 214px; --gutter: 18px; }
+  .grid { gap: 38px 12px; }
+  /* half-width cards: the saving says it on its own */
+  .card .price__deal-label { display: none; }
+}
+
+@media (max-width: 340px) {
+  :root { --phone-h: 190px; }
+  .card__name { font-size: 1.2rem; }
+}
+
+/* =========================================================================
+   11  THE PHONE
+   Realistic proportions, a thin machined bezel and a metallic rim. It is
+   the product, so it gets the detail. --phone-h is the height of the
+   DISPLAY, so the glass is exactly 9:16 and a 1080x1920 preview fills it.
+   ========================================================================= */
+
+.phone {
+  --bezel: max(4px, calc(var(--phone-h) * 0.021));
+  position: relative;
+  width: calc(var(--phone-h) * 9 / 16 + var(--bezel) * 2);
+  height: calc(var(--phone-h) + var(--bezel) * 2);
+  margin-inline: auto;
+}
+
+/* side buttons */
+.phone::before,
+.phone::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #3A3230, #181314);
+}
+.phone::before { left: -2px; top: 22%; width: 2px; height: 15%; }
+.phone::after  { right: -2px; top: 27%; width: 2px; height: 11%; }
+
+.phone__shadow {
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  bottom: -5.5%;
+  height: 9%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(44, 11, 18, 0.34), rgba(44, 11, 18, 0) 70%);
+  filter: blur(5px);
+  transition: opacity 0.75s var(--ease-soft), transform 0.75s var(--ease-soft);
+  pointer-events: none;
+}
+
+.phone__body {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: var(--bezel);
+  border-radius: 13.5% / 7.6%;
+  background: linear-gradient(152deg,
+    #6F6360 0%, #2D2526 9%, #1B1516 34%, #120E0F 62%, #231B1C 88%, #5B504E 100%);
+  box-shadow:
+    0 26px 44px -28px rgba(44, 11, 18, 0.62),
+    0 6px 16px -10px rgba(44, 11, 18, 0.34);
+  transition: box-shadow 0.75s var(--ease-soft);
+}
+
+/* the machined rim: a 1px gradient outline, masked to the border only */
+.phone__body::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(150deg,
+    rgba(255, 255, 255, 0.46) 0%,
+    rgba(255, 255, 255, 0.05) 26%,
+    rgba(255, 255, 255, 0) 52%,
+    rgba(255, 255, 255, 0.1) 78%,
+    rgba(255, 255, 255, 0.38) 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.phone__screen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 10.6% / 5.4%;
+  background: #0E0A0B;
+  isolation: isolate;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.55);
+}
+
+.phone__poster,
+.phone__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+.phone__poster { z-index: 1; }
+.phone__video {
+  z-index: 2;
+  opacity: 0;
+  background: transparent;
+  transition: opacity 1.1s var(--ease);
+}
+.phone__video.is-ready { opacity: 1; }
+
+/* the glass: a fixed top light and a sheen that travels on hover */
+.phone__sheen {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background:
+    linear-gradient(198deg, rgba(255, 255, 255, 0.13) 0%, rgba(255, 255, 255, 0) 26%),
+    linear-gradient(112deg, rgba(255, 255, 255, 0) 34%, rgba(255, 255, 255, 0.1) 47%, rgba(255, 255, 255, 0) 60%);
+  background-size: 100% 100%, 260% 100%;
+  background-position: 0 0, 12% 0;
+  background-repeat: no-repeat;
+  transition: background-position 1.5s var(--ease-soft);
+}
+
+/* a glare that follows the pointer while the phone tilts */
+.phone__screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(55% 40% at var(--gx, 50%) var(--gy, 0%),
+    rgba(255, 250, 238, 0.26), rgba(255, 250, 238, 0) 70%);
+  transition: opacity 0.6s var(--ease);
+}
+
+/* shown only when neither a film nor a still is available */
+.phone__coming {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(168deg, var(--silk) 0%, var(--silk-deep) 100%);
+  color: rgba(240, 221, 178, 0.78);
+  font-family: var(--serif);
+  font-size: clamp(13px, 1.1vw, 16px);
+  font-style: italic;
+  letter-spacing: 0.04em;
+  line-height: 1.5;
+  text-align: center;
+}
+.phone__coming::before {
+  content: "";
+  width: 24px;
+  height: 1px;
+  margin-bottom: 13px;
+  background: rgba(216, 180, 110, 0.55);
+}
+
+.watermark {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 7%;
+  z-index: 3;
+  padding-left: 0.42em;
+  font-family: var(--serif);
+  font-size: 8px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.4);
+  text-shadow: 0 1px 7px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}
+.watermark--large { bottom: 6%; font-size: 11px; letter-spacing: 0.46em; }
+
+/* ---- the play mark on a card's phone ----
+   A still gives no reason to think there is anything to watch; this says
+   so. It is decorative: the phone behind it is already the button. */
+.phone__play {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  width: clamp(40px, 18%, 54px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1px solid rgba(240, 221, 178, 0.55);
+  background: rgba(44, 11, 18, 0.46);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  color: var(--on-silk);
+  pointer-events: none;
+  transition: transform 0.5s var(--ease), background 0.5s var(--ease),
+              border-color 0.5s var(--ease), opacity 0.4s var(--ease);
+}
+.phone__play svg { width: 38%; height: 38%; margin-left: 7%; }
+
+.card__trigger:hover .phone__play,
+.card__trigger:focus-visible .phone__play {
+  transform: translate(-50%, -50%) scale(1.08);
+  background: rgba(44, 11, 18, 0.62);
+  border-color: rgba(240, 221, 178, 0.8);
+}
+
+/* nothing to play: the plate says so instead */
+.phone__coming:not([hidden]) ~ .phone__play { display: none; }
+
+/* ---- Play again: the one control inside a phone screen ---- */
+.phone__replay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 0;
+  border: 0;
+  cursor: pointer;
+  background: radial-gradient(70% 50% at 50% 50%, rgba(23, 6, 10, 0.74), rgba(23, 6, 10, 0.5));
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+  color: var(--on-silk);
+  animation: replay-in 0.5s var(--ease-soft) backwards;
+}
+@keyframes replay-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.phone__replay-mark {
+  display: grid;
+  place-items: center;
+  width: clamp(44px, 22%, 62px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px solid rgba(240, 221, 178, 0.55);
+  background: rgba(44, 11, 18, 0.5);
+  transition: transform 0.45s var(--ease), border-color 0.45s var(--ease);
+}
+.phone__replay-mark svg { width: 46%; height: 46%; }
+.phone__replay-text {
+  font-size: var(--t-sm);
+  font-weight: 500;
+  color: var(--on-silk);
+}
+.phone__replay:hover .phone__replay-mark,
+.phone__replay:focus-visible .phone__replay-mark {
+  transform: scale(1.08);
+  border-color: var(--zari-lt);
+}
+
+/* ---- hover: the phone lifts, the glass catches the light ---- */
+
+.card__trigger:hover .phone__body,
+.card__trigger:focus-visible .phone__body {
+  box-shadow:
+    0 50px 70px -36px rgba(44, 11, 18, 0.6),
+    0 24px 60px -24px rgba(164, 126, 62, 0.42),
+    0 0 0 0.5px rgba(216, 180, 110, 0.5);
+}
+.card__trigger:hover .phone__sheen,
+.card__trigger:focus-visible .phone__sheen { background-position: 0 0, 88% 0; }
+.card__trigger:hover .phone__shadow,
+.card__trigger:focus-visible .phone__shadow { opacity: 0.62; transform: scale(0.9); }
+
+/* 3D tilt and glare for a mouse only; js/luxe.js writes --rx / --ry and
+   the glare's position --gx / --gy on the phone */
+.luxe-tilt .card__trigger .phone {
+  transform: perspective(1100px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform 0.9s var(--ease-luxe);
+}
+.luxe-tilt .card__trigger.is-tilting .phone { transition: transform 0.35s var(--ease-luxe); }
+.luxe-tilt .card__trigger:hover .phone__screen::after { opacity: 1; }
+
+/* ---- as a card arrives, its screen wakes: a wipe up and a settle ---- */
+.card.reveal .phone__screen { clip-path: inset(100% 0 0 0); }
+.card.reveal.is-visible .phone__screen {
+  clip-path: inset(0 0 0 0);
+  transition: clip-path 1.3s var(--ease-luxe) calc(var(--reveal-delay, 0ms) + 180ms);
+}
+.card.reveal .phone__poster { transform: scale(1.22); }
+.card.reveal.is-visible .phone__poster {
+  transform: scale(1);
+  transition: transform 2s var(--ease-luxe) calc(var(--reveal-delay, 0ms) + 180ms);
+}
+
+/* =========================================================================
+   12  CUSTOM BUILD
+   A service, not another template - so it is set as an invitation card
+   of its own: raised paper, a gilt inner rule, a lozenge at the head and
+   the foot of the rule.
+   ========================================================================= */
+
+.custom {
+  padding-block: clamp(64px, 10vh, 120px);
+  background: var(--paper);
+}
+
+.custom__inner {
+  position: relative;
+  isolation: isolate;
+  max-width: 660px;
+  margin-inline: auto;
+  padding: clamp(48px, 6vw, 76px) clamp(28px, 5vw, 68px);
+  text-align: center;
+  background:
+    radial-gradient(120% 120% at 50% 0%, rgba(216, 180, 110, 0.14), rgba(216, 180, 110, 0) 60%),
+    var(--paper-hi);
+  border: 1px solid rgba(164, 126, 62, 0.4);
+  box-shadow:
+    0 50px 90px -60px rgba(44, 11, 18, 0.42),
+    0 18px 40px -30px rgba(134, 96, 31, 0.24);
+}
+
+/* the gilt rule set inside the edge, as a printed card is bordered */
+.custom__frame {
+  position: absolute;
+  inset: 10px;
+  z-index: -1;
+  border: 1px solid rgba(164, 126, 62, 0.34);
+  pointer-events: none;
+}
+.custom__frame::before,
+.custom__frame::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  width: 9px;
+  height: 9px;
+  margin-left: -5px;
+  background: var(--paper-hi);
+  border: 1px solid var(--zari-dk);
+  transform: rotate(45deg);
+}
+.custom__frame::before { top: -5px; }
+.custom__frame::after  { bottom: -5px; }
+
+.custom__title {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: clamp(2rem, 1.4rem + 2.2vw, 3.1rem);
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+.custom__desc {
+  margin: 16px auto 0;
+  max-width: 40ch;
+  font-size: var(--t-base);
+  line-height: 1.65;
+  color: var(--ink-2);
+  text-wrap: balance;
+}
+
+.price--custom { margin-top: 24px; }
+.price--custom .price__now {
+  font-size: 2.1rem;
+  background-image: var(--foil-ink);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+.custom__cta {
+  width: 100%;
+  max-width: 300px;
+  margin-top: 26px;
+}
+
+@media (max-width: 600px) {
+  .custom { padding-block: 44px; }
+  /* moved after the collections on a phone (js/luxe.js) */
+  .custom.is-after-collections { border-top: 1px solid var(--line-soft); }
+  .custom__inner { padding: 40px 24px 36px; }
+  .custom__title { font-size: 1.95rem; }
+  .custom__desc { font-size: var(--t-sm); }
+  .price--custom .price__now { font-size: 1.8rem; }
+  .custom__cta { max-width: none; margin-top: 20px; }
+}
+
+/* =========================================================================
+   13  HOW IT WORKS
+   A real sequence, so it is numbered - three steps on one drawn line.
+   ========================================================================= */
+
+.process {
+  position: relative;
+  padding-block: var(--section);
+  background: var(--paper-2);
+}
+
+.process__head {
+  max-width: 42rem;
+  margin: 0 auto clamp(46px, 8vh, 84px);
+  text-align: center;
+}
+
+.process__title {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: var(--t-h2);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.process__steps {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(28px, 4vw, 64px);
+  margin: 0;
+  padding: 0;
+}
+
+/* the line the steps stand on, drawn as they arrive */
+.process__steps::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(clamp(3rem, 6vw, 4.6rem) * 0.62);
+  height: 1px;
+  background: linear-gradient(90deg,
+    rgba(164, 126, 62, 0), rgba(164, 126, 62, 0.55) 15%,
+    rgba(164, 126, 62, 0.55) 85%, rgba(164, 126, 62, 0));
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 1.8s var(--ease-luxe) 0.2s;
+}
+.process__steps.is-drawn::before { transform: scaleX(1); }
+
+.process__step {
+  position: relative;
+  text-align: center;
+  padding-inline: clamp(4px, 1vw, 16px);
+}
+
+/* A ground-coloured plate breaks the line behind the numeral. It belongs
+   to the step, not the numeral, so it cannot paint over the foil type. */
+.process__step::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: clamp(110px, 11vw, 160px);
+  height: calc(clamp(3rem, 6vw, 4.6rem) * 1.2);
+  transform: translateX(-50%);
+  background: var(--paper-2);
+  pointer-events: none;
+}
+
+.process__num {
+  position: relative;
+  display: inline-block;
+  padding-inline: 0.28em;
+  font-family: var(--serif);
+  font-size: clamp(3rem, 6vw, 4.6rem);
+  font-weight: 500;
+  line-height: 1.2;
+  font-variant-numeric: lining-nums;
+  font-feature-settings: "lnum" 1;
+  background-image: var(--foil-ink);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  transition: background-position 1.4s var(--ease-luxe);
+}
+.process__step:hover .process__num { background-position: 100% 50%; }
+
+.process__name {
+  margin-top: clamp(12px, 2vh, 20px);
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: var(--t-h3);
+  line-height: 1.15;
+}
+
+.process__text {
+  margin: 10px auto 0;
+  max-width: 30ch;
+  font-size: var(--t-base);
+  line-height: 1.65;
+  color: var(--ink-2);
+  text-wrap: balance;
+}
+
+.process__cta {
+  display: flex;
+  justify-content: center;
+  margin-top: clamp(44px, 7vh, 72px);
+}
+.process__cta .btn { min-width: 260px; }
+
+@media (max-width: 760px) {
+  .process__steps {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 40px;
+    max-width: 26rem;
+    margin-inline: auto;
+  }
+  /* stacked, the line runs down instead of across */
+  .process__steps::before {
+    left: 50%;
+    right: auto;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    height: auto;
+    background: linear-gradient(180deg,
+      rgba(164, 126, 62, 0), rgba(164, 126, 62, 0.4) 10%,
+      rgba(164, 126, 62, 0.4) 90%, rgba(164, 126, 62, 0));
+    transform: scaleY(0);
+    transform-origin: center top;
+  }
+  .process__steps.is-drawn::before { transform: scaleY(1); }
+  .process__step { background: var(--paper-2); padding-block: 8px; }
+}
+
+@media (max-width: 600px) {
+  .process { padding-block: 60px; }
+  .process__head { margin-bottom: 36px; }
+  .process__cta .btn { width: 100%; min-width: 0; }
+}
+
+/* =========================================================================
+   14  QUESTIONS
+   The answers a couple needs before writing - so the WhatsApp message they
+   send is the order, not the first question. Native <details>, so every
+   answer opens with the keyboard and without JavaScript.
+   ========================================================================= */
+
+.faq {
+  padding-block: var(--section);
+  background: var(--paper);
+}
+
+.faq__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: clamp(40px, 6vw, 110px);
+  align-items: start;
+}
+
+.faq__head {
+  position: sticky;
+  top: calc(var(--promo-h) + var(--header-h) + 36px);
+}
+
+.faq__title {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: var(--t-h2);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.faq__lead {
+  margin-top: 18px;
+  max-width: 34ch;
+  font-size: var(--t-md);
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+
+.faq__head .btn { margin-top: 28px; }
+
+.faq__list { border-top: 1px solid var(--line); }
+
+.faq__item { border-bottom: 1px solid var(--line); }
+
+.faq__q {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 24px 2px;
+  list-style: none;
+  cursor: pointer;
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: clamp(1.3rem, 1.1rem + 0.6vw, 1.65rem);
+  line-height: 1.25;
+  color: var(--ink);
+  transition: color 0.35s var(--ease);
+}
+.faq__q::-webkit-details-marker { display: none; }
+.faq__q::marker { content: ""; }
+.faq__q:hover { color: var(--silk-2); }
+
+/* a plus that closes to a minus */
+.faq__mark {
+  position: relative;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  transition: background 0.4s var(--ease), border-color 0.4s var(--ease);
+}
+.faq__mark::before,
+.faq__mark::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 12px;
+  height: 1.5px;
+  margin: -0.75px 0 0 -6px;
+  background: var(--silk);
+  transition: transform 0.45s var(--ease-hero), background 0.4s var(--ease);
+}
+.faq__mark::after { transform: rotate(90deg); }
+.faq__item[open] .faq__mark { background: var(--silk); border-color: var(--silk); }
+.faq__item[open] .faq__mark::before,
+.faq__item[open] .faq__mark::after { background: var(--zari); }
+.faq__item[open] .faq__mark::after { transform: rotate(0deg); }
+
+.faq__a {
+  max-width: 62ch;
+  padding: 0 52px 28px 2px;
+  font-size: var(--t-base);
+  line-height: 1.7;
+  color: var(--ink-2);
+}
+.faq__a p + p { margin-top: 10px; }
+.faq__a strong { font-weight: 600; color: var(--ink); }
+.faq__item[open] .faq__a { animation: faq-open 0.5s var(--ease-soft); }
+@keyframes faq-open {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@media (max-width: 899px) {
+  .faq__inner { grid-template-columns: minmax(0, 1fr); gap: 36px; }
+  .faq__head { position: static; }
+}
+
+@media (max-width: 600px) {
+  .faq { padding-block: 60px; }
+  .faq__q { padding: 20px 0; gap: 16px; }
+  .faq__a { padding-right: 0; font-size: var(--t-sm); }
+  .faq__head .btn { width: 100%; }
+}
+
+/* =========================================================================
+   15  FOOTER
+   The silk returns, with its zari border along the top.
+   ========================================================================= */
+
+.site-footer {
+  --focus: var(--zari);
+  position: relative;
+  overflow: hidden;
+  color: var(--on-silk);
+  background:
+    radial-gradient(70% 50% at 50% 0%, rgba(98, 32, 44, 0.7), rgba(98, 32, 44, 0) 70%),
+    var(--silk);
+}
+
+.site-footer__inner {
+  padding-top: clamp(64px, 10vh, 110px);
+  text-align: center;
+}
+
+/* the gold monogram: the maroon half of the full lockup would vanish here */
+.site-footer__logo {
+  display: none;
+  height: clamp(68px, 9.5vw, 92px);
+  width: auto;
+  margin: 0 auto 12px;
+  transition: transform 1.2s var(--ease-luxe);
+}
+html.has-mark .site-footer__logo { display: block; }
+.site-footer__logo:hover { transform: rotate(-4deg) scale(1.04); }
+
+.site-footer__brand {
+  font-family: var(--serif);
+  font-size: 1.85rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.site-footer__statement {
+  margin: 10px auto 0;
+  max-width: 30ch;
+  font-family: var(--serif);
+  font-size: clamp(1.2rem, 1.05rem + 0.6vw, 1.5rem);
+  font-style: italic;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--zari-lt);
+}
+
+.site-footer__nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px clamp(20px, 3vw, 36px);
+  margin-top: clamp(30px, 5vh, 44px);
+}
+.site-footer__nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: var(--t-sm);
+  font-weight: 500;
+  color: var(--on-silk-2);
+  transition: color 0.4s var(--ease);
+}
+.site-footer__nav a:hover,
+.site-footer__nav a:focus-visible { color: var(--on-silk); }
+
+.social {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(18px, 3vw, 34px);
+  margin-top: 8px;
+}
+.social__link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  gap: 9px;
+  padding: 9px 2px;
+  font-size: var(--t-sm);
+  font-weight: 500;
+  color: var(--on-silk-2);
+  transition: color 0.4s var(--ease);
+}
+.social__link .ico { font-size: 16px; color: var(--zari); }
+.social__link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 8px;
+  height: 1px;
+  background: var(--zari);
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform 0.6s var(--ease-luxe);
+}
+.social__link:hover,
+.social__link:focus-visible { color: var(--on-silk); }
+.social__link:hover::after,
+.social__link:focus-visible::after {
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+
+.site-footer__note {
+  margin: clamp(28px, 5vh, 44px) auto 0;
+  max-width: 52ch;
+  font-size: var(--t-xs);
+  line-height: 1.8;
+  color: var(--on-silk-3);
+}
+
+.site-footer__copy {
+  margin-top: 18px;
+  font-size: var(--t-xs);
+  color: var(--on-silk-3);
+}
+
+/* the wordmark set large and faint, rising a little as the footer arrives */
+.site-footer__giant {
+  margin: clamp(28px, 5vh, 56px) 0 0;
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: clamp(5.2rem, 22vw, 20rem);
+  line-height: 0.78;
+  letter-spacing: -0.03em;
+  text-align: center;
+  white-space: nowrap;
+  background: linear-gradient(180deg,
+    rgba(216, 180, 110, 0.22) 0%, rgba(216, 180, 110, 0.07) 55%, rgba(216, 180, 110, 0) 88%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  translate: 0 calc((1 - var(--fp, 1)) * 60px);
+}
+
+/* =========================================================================
+   16  FLOATING WHATSAPP
+   Always one tap from a conversation. Appears once the masthead has gone,
+   and steps aside for the footer and the preview.
+   ========================================================================= */
+
+.float-wa {
+  --focus: var(--zari);
+  position: fixed;
+  right: max(clamp(16px, 2.4vw, 32px), env(safe-area-inset-right, 0px));
+  bottom: max(clamp(16px, 2.4vw, 32px), env(safe-area-inset-bottom, 0px));
+  z-index: 60;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  height: 58px;
+  padding: 0 24px 0 9px;
+  border-radius: 999px;
+  color: var(--on-silk);
+  background: linear-gradient(160deg, var(--silk-2) 0%, var(--silk-deep) 100%);
+  border: 1px solid rgba(216, 180, 110, 0.5);
+  box-shadow:
+    0 22px 44px -20px rgba(44, 11, 18, 0.75),
+    0 0 0 6px rgba(248, 242, 234, 0.4);
+  font-size: var(--t-sm);
+  font-weight: 500;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(24px) scale(0.92);
+  transition:
+    opacity 0.6s var(--ease-luxe),
+    transform 0.8s var(--ease-luxe),
+    visibility 0s linear 0.8s,
+    box-shadow 0.5s var(--ease),
+    border-color 0.5s var(--ease);
+}
+.float-wa.is-shown {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition:
+    opacity 0.6s var(--ease-luxe),
+    transform 0.8s var(--ease-luxe),
+    visibility 0s,
+    box-shadow 0.5s var(--ease),
+    border-color 0.5s var(--ease);
+}
+.float-wa:hover,
+.float-wa:focus-visible {
+  border-color: var(--zari-lt);
+  box-shadow:
+    0 28px 54px -20px rgba(44, 11, 18, 0.8),
+    0 0 0 6px rgba(216, 180, 110, 0.24);
+}
+
+.float-wa__icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--foil);
+  background-size: 200% 100%;
+  color: var(--silk-deep);
+  font-size: 19px;
+  transition: background-position 1s var(--ease-luxe);
+}
+.float-wa:hover .float-wa__icon { background-position: 100% 50%; }
+
+/* one soft ring, now and then - noticed, never nagging */
+.float-wa__icon::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(216, 180, 110, 0.8);
+  opacity: 0;
+  animation: wa-ring 7s var(--ease) 2s infinite;
+}
+@keyframes wa-ring {
+  0%   { transform: scale(1);   opacity: 0.8; }
+  28%  { transform: scale(1.9); opacity: 0; }
+  100% { transform: scale(1.9); opacity: 0; }
+}
+
+body.is-locked .float-wa {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+@media (max-width: 600px) {
+  .float-wa {
+    width: 54px;
+    height: 54px;
+    padding: 0;
+    justify-content: center;
+    box-shadow:
+      0 18px 36px -16px rgba(44, 11, 18, 0.75),
+      0 0 0 5px rgba(248, 242, 234, 0.35);
+  }
+  .float-wa__label { display: none; }
+  .float-wa__icon { width: 40px; height: 40px; font-size: 19px; }
+}
+
+/* =========================================================================
+   17  PREVIEW MODAL
+   On a phone the browser's own toolbars sit over the page and 100vh is the
+   height WITHOUT them, so the panel is sized in dvh, and the modal scrolls
+   and centres with auto margins: nothing in it can ever be out of reach.
+   ========================================================================= */
+
+.modal {
+  --focus: var(--zari);
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: clamp(16px, 4vw, 52px);
+  padding-bottom: max(clamp(16px, 4vw, 52px), env(safe-area-inset-bottom, 0px));
+  height: 100vh;
+  height: 100dvh;
+}
+.modal[hidden] { display: none; }
+
+/* fixed, so it stays behind the content as the modal scrolls */
+.modal__backdrop {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(120% 90% at 50% 30%, #3C1019 0%, var(--silk-night) 72%);
+  opacity: 0;
+  -webkit-backdrop-filter: blur(0px);
+  backdrop-filter: blur(0px);
+  transition: opacity 0.55s var(--ease), backdrop-filter 0.7s var(--ease),
+              -webkit-backdrop-filter 0.7s var(--ease);
+}
+.modal.is-open .modal__backdrop {
+  opacity: 1;
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+
+.modal__panel {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(260px, 360px);
+  align-items: center;
+  gap: clamp(30px, 5.5vw, 86px);
+  width: 100%;
+  max-width: 1000px;
+  margin: auto;
+  padding: clamp(22px, 3vw, 44px);
+}
+
+.modal__stage { display: flex; justify-content: center; }
+
+.phone--large {
+  --phone-h: min(68vh, 600px);
+  --phone-h: min(68dvh, 600px);
+  transform-origin: center center;
+  transition: transform 0.72s var(--ease-cine), opacity 0.4s var(--ease);
+}
+.phone--large .phone__body {
+  animation: none;
+  box-shadow:
+    0 0 0 0.5px rgba(216, 180, 110, 0.4),
+    0 80px 110px -60px rgba(0, 0, 0, 0.95),
+    0 20px 50px -30px rgba(0, 0, 0, 0.7);
+}
+.phone--large .phone__shadow {
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0) 70%);
+}
+
+/* every piece of the info column arrives just after the phone lands */
+.modal__info > * {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.28s var(--ease), transform 0.28s var(--ease);
+}
+.modal.is-open .modal__info > * {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.7s var(--ease-soft) calc(240ms + var(--i, 0) * 60ms),
+    transform 0.8s var(--ease-soft) calc(240ms + var(--i, 0) * 60ms);
+}
+
+.modal__close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  font-size: 15px;
+  color: var(--on-silk-2);
+  border: 1px solid rgba(216, 180, 110, 0.3);
+  border-radius: 50%;
+  opacity: 0;
+  transition: color 0.4s var(--ease), border-color 0.4s var(--ease),
+              transform 0.5s var(--ease), opacity 0.5s var(--ease) 320ms;
+}
+.modal.is-open .modal__close { opacity: 1; }
+.modal__close:hover,
+.modal__close:focus-visible {
+  color: var(--on-silk);
+  border-color: var(--zari);
+  transform: rotate(90deg);
+}
+
+.modal__info { color: var(--on-silk); }
+
+.modal__eyebrow {
+  margin-bottom: 12px;
+  font-size: var(--t-sm);
+  font-weight: 500;
+  color: var(--zari);
+}
+
+.modal__title {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: clamp(2.4rem, 4vw, 3.4rem);
+  line-height: 1.05;
+  letter-spacing: 0.03em;
+  font-variant-numeric: lining-nums;
+  font-feature-settings: "lnum" 1;
+}
+
+.modal__desc {
+  margin-top: 14px;
+  max-width: 34ch;
+  font-size: var(--t-base);
+  line-height: 1.65;
+  color: var(--on-silk-2);
+}
+
+.features--modal {
+  justify-content: flex-start;
+  margin-top: 22px;
+}
+.features--modal .features__item { color: var(--on-silk-2); font-size: var(--t-sm); }
+.features--modal .features__item .ico { color: var(--zari); }
+.features--modal .features__item--lang { color: var(--zari-lt); }
+
+.price__deal--modal { margin-top: 24px; }
+.price__deal--modal .price__deal-label { color: var(--silk-deep); background: var(--zari); }
+.price__deal--modal .price__deal-save { color: var(--zari-lt); }
+.price__deal--modal + .price--modal { margin-top: 10px; }
+
+.price--modal {
+  justify-content: flex-start;
+  margin-top: 22px;
+}
+.price--modal .price__now { font-size: 1.85rem; color: var(--on-silk); }
+.price--modal .price__was { color: var(--on-silk-3); }
+
+.modal__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 320px;
+  margin-top: 28px;
+}
+.modal__actions .btn { width: 100%; }
+
+.modal__hint {
+  margin-top: 20px;
+  font-size: var(--t-xs);
+  color: var(--on-silk-3);
+}
+.modal__hint kbd {
+  padding: 1px 6px;
+  font: inherit;
+  border: 1px solid rgba(247, 238, 227, 0.3);
+  border-radius: 3px;
+}
+
+@media (max-width: 1024px) {
+  /* the modal stacks: phone above, details below, both centred */
+  .modal__panel {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    text-align: center;
+    max-width: 540px;
+    gap: 30px;
+    padding-top: 58px;
+  }
+  .phone--large { --phone-h: min(56vh, 470px); --phone-h: min(56dvh, 470px); }
+  .modal__info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .modal__desc { margin-inline: auto; }
+  .features--modal,
+  .price--modal { justify-content: center; }
+}
+
+@media (max-width: 600px) {
+  .phone--large { --phone-h: min(54vh, 430px); --phone-h: min(54dvh, 430px); }
+  .modal__close { top: 2px; right: 2px; width: 44px; height: 44px; }
+  .modal__hint { display: none; }
+  .modal__actions { max-width: none; }
+}
+
+@media (max-width: 430px) {
+  .phone--large { --phone-h: min(52vh, 400px); --phone-h: min(52dvh, 400px); }
+  .modal__panel { padding-top: 56px; }
+  .modal__title { font-size: 2.2rem; }
+  .modal__desc { font-size: var(--t-sm); }
+}
+
+/* short screens: the preview must fit with its buttons in reach */
+@media (max-width: 1024px) and (max-height: 820px) {
+  .phone--large { --phone-h: min(46vh, 360px); --phone-h: min(46dvh, 360px); }
+  .modal__panel { padding-top: 44px; gap: 20px; }
+  .modal__eyebrow { margin-bottom: 8px; }
+  .modal__desc { margin-top: 8px; }
+  .modal__actions { margin-top: 20px; }
+  .modal__hint { display: none; }
+}
+
+@media (max-height: 640px) and (orientation: landscape) {
+  .modal__panel {
+    grid-template-columns: auto minmax(220px, 340px);
+    text-align: left;
+    padding-top: clamp(22px, 3vw, 44px);
+  }
+  .modal__info { align-items: flex-start; }
+  .features--modal,
+  .price--modal { justify-content: flex-start; }
+  .modal__desc { display: none; }
+  .phone--large { --phone-h: min(80vh, 380px); --phone-h: min(80dvh, 380px); }
+}
+
+/* =========================================================================
+   18  CURSOR
+   Over a phone the pointer becomes a small silk disc that says what a
+   click will do. Everywhere else the system pointer is left alone.
+   ========================================================================= */
+
+.cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 190;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.cursor__disc {
+  position: absolute;
+  left: -44px;
+  top: -44px;
+  display: grid;
+  place-items: center;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  border: 1px solid rgba(240, 221, 178, 0.6);
+  background: rgba(44, 11, 18, 0.55);
+  -webkit-backdrop-filter: blur(10px) saturate(1.3);
+  backdrop-filter: blur(10px) saturate(1.3);
+  color: var(--on-silk);
+  font-family: var(--sans);
+  font-size: var(--t-sm);
+  font-weight: 500;
+  box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.55);
+  opacity: 0;
+  transform: scale(0.3);
+  transition: transform 0.55s var(--ease-luxe), opacity 0.35s var(--ease);
+}
+.cursor.is-active .cursor__disc { opacity: 1; transform: scale(1); }
+.cursor.is-active.is-pressed .cursor__disc { transform: scale(0.88); }
+
+/* over a phone the disc IS the pointer, and the play mark steps back */
+.has-cursor .card__trigger { cursor: none; }
+.has-cursor .card__trigger:hover .phone__play {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.6);
+}
+
+/* =========================================================================
+   19  REVEALS
+   ========================================================================= */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 1s var(--ease-soft) var(--reveal-delay, 0ms),
+    transform 1.1s var(--ease-soft) var(--reveal-delay, 0ms);
+}
+
+/* headlines break into even lines rather than stranding a word */
+.process__title,
+.custom__title,
+.faq__title { text-wrap: balance; }
+
+/* touch screens have no hover, so nothing may depend on it */
+@media (hover: none) {
+  .card__trigger:hover { transform: none; }
+}
+
+/* =========================================================================
+   20  REDUCED MOTION
+   Anyone who has asked their system for less movement gets none of it:
+   every word and every design is simply shown.
+   ========================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  .veil { display: none; }
+  html.is-booting .boot { opacity: 1; transform: none; }
+  html.is-booting .hero__stage { opacity: 1; transform: none; }
+  .reveal { opacity: 1; transform: none; }
+  .modal__info > * { opacity: 1; transform: none; }
+  .modal__close { opacity: 1; }
+
+  .hero__bg { display: none; }
+  .hero__rail-track { animation: none; transform: none; }
+  .hero__copy,
+  .hero__stage,
+  .hero__stage .hero__phone[data-pos] { translate: none; rotate: none; }
+  .hero__copy { opacity: 1; }
+  .hero__stage .hero__phone { transition: none; }
+  .hero__stage .hero__phone[data-pos="left"] .phone__body { animation: none; transform: rotate(-1.4deg); }
+  .hero__stage .hero__phone[data-pos="right"] .phone__body { animation: none; transform: rotate(1.4deg); }
+  .hero__stage .hero__phone[data-pos="center"] .phone__body { animation: none; }
+  .hero__line.is-masked .line__i,
+  .mask-line.is-masked .line__i { transform: none; }
+
+  .signature,
+  .signature--hero,
+  html.is-ready .signature--hero { opacity: 1; transform: scaleX(1); transition: none; }
+  .collection__head .signature { opacity: 1; transform: rotate(45deg); }
+
+  .zari::before,
+  .float-wa__icon::after { animation: none; }
+
+  .collection__head.reveal .collection__title { clip-path: none; }
+  .collection__head.reveal .collection__rule { transform: none; }
+  .collection__head.reveal .collection__count { opacity: 1; }
+  .card.reveal .phone__screen { clip-path: none; }
+  .card.reveal .phone__poster { transform: none; }
+  .process__steps::before { transform: none; }
+  .site-footer__giant { translate: none; }
+
+  .card__trigger:hover,
+  .card__trigger:focus-visible { transform: none; }
+  .btn:hover,
+  .btn:focus-visible { transform: none; box-shadow: none; }
+  .btn--solid::after,
+  .btn--zari::after { display: none; }
+  .link-cta:hover .ico { transform: none; }
+  .modal__close:hover { transform: none; }
+  .phone--large { transition: none; }
+  .phone__replay { animation: none; }
+  .faq__item[open] .faq__a { animation: none; }
+}

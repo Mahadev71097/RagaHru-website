@@ -32,9 +32,10 @@ const SITE_CONFIG = {
 
   /* THE POSTER RAIL BEHIND THE MASTHEAD
      -----------------------------------------------------------------------
-     A single unbroken row of posters drifting slowly across the top of the
-     page, the way a cinema runs its front-of-house. It loops forever and
-     never seams.
+     Three rows of posters drifting slowly behind the masthead, the way a
+     cinema runs its front-of-house: small rows along the top and the foot
+     rolling right, a large row through the middle rolling left. They loop
+     forever and never seam. All three use this one list.
 
          assets/hero/rail/poster-01.jpg ... poster-10.jpg
 
@@ -42,7 +43,7 @@ const SITE_CONFIG = {
      or remove one, add or remove a line here - the row measures itself and
      keeps the same drift speed either way.
 
-     Portrait, 2:3 (about 400 x 600). They sit under the espresso ground and
+     Portrait, 2:3 (about 400 x 600). They sit under the maroon ground and
      the warm bloom, so they read as atmosphere, never as the subject.
 
      Empty this list and the masthead falls back to heroPoster / heroVideo
@@ -105,6 +106,22 @@ const SITE_CONFIG = {
   customPrice: 1499,
   customMessage: "Hello RagaHru, I would like to enquire about a custom-designed wedding website. Could you please share the details and the next steps? Thank you.",
 
+  /* SEASON SALE
+     The name shown beside every reduced price ("Season Sale · Save ₹500") -
+     the saving is worked out from price and originalPrice in templates.js.
+     Set it to "" when the sale ends and the tags disappear. The bar at the
+     top of the page is edited in index.html. */
+  saleLabel: "Season sale",
+
+  /* The message behind every general WhatsApp button - the masthead, the
+     header, How it works, Questions and the floating Enquire button. A
+     general enquiry, not about any one design. */
+  generalMessage: "Hello RagaHru, I would like to know more about your wedding websites. Could you please share the details? Thank you.",
+
+  /* "Share with family" in the large preview sends this, followed by a link
+     that opens that exact design. {template} becomes its code, e.g. HN01. */
+  shareMessage: "Have a look at this wedding invitation design, {template}, from RagaHru:",
+
   /* Social */
   instagramUrl: "https://www.instagram.com/ragahru?stkn=OG56d3F5OHJvdgrd&utm_source=qr",
 
@@ -146,12 +163,12 @@ const SITE_CONFIG = {
      appears under the phone and in the WhatsApp message, so an enquiry
      names one template and only one. */
   collections: [
-    { key: "hindu",     label: "Hindu Weddings",     code: "HN" },
-    { key: "christian", label: "Christian Weddings", code: "CH" },
-    { key: "islamic",   label: "Islamic Weddings",   code: "IS" }
+    { key: "hindu",     label: "Hindu weddings",     code: "HN" },
+    { key: "christian", label: "Christian weddings", code: "CH" },
+    { key: "islamic",   label: "Islamic weddings",   code: "IS" }
 
-    /* , { key: "housewarming", label: "House Warming", code: "HW" } */
-    /* , { key: "babyshower",   label: "Baby Shower",   code: "BS" } */
+    /* , { key: "housewarming", label: "House warming", code: "HW" } */
+    /* , { key: "babyshower",   label: "Baby shower",   code: "BS" } */
     /* , { key: "birthday",     label: "Birthday",      code: "BD" } */
   ]
 };
